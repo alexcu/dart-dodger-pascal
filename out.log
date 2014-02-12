@@ -1,0 +1,54 @@
+Free Pascal Compiler version 2.6.2 [2013/02/03] for i386
+Copyright (c) 1993-2012 by Florian Klaempfl and others
+Target OS: Darwin for i386
+Compiling ./src/./DartDodgerv4.pas
+Compiling ./lib/SwinGame.pas
+Compiling ./lib/sgTypes.pas
+Compiling ./lib/sgShared.pas
+Compiling ./lib/stringhash.pas
+Compiling ./lib/hashtable.pas
+Compiling ./lib/comparable.pas
+Assembling (pipe) ./tmp/sdl12/Release/comparable.s
+Assembling (pipe) ./tmp/sdl12/Release/hashtable.s
+Assembling (pipe) ./tmp/sdl12/Release/stringhash.s
+Compiling ./lib/sgInputBackend.pas
+Compiling ./lib/sgDriverInput.pas
+Compiling ./lib/sgDriverInputSDL.pas
+Compiling ./lib/sdl.pas
+Assembling (pipe) ./tmp/sdl12/Release/sdl.s
+Compiling ./lib/sdl_ttf.pas
+Assembling (pipe) ./tmp/sdl12/Release/sdl_ttf.s
+Compiling ./lib/sgDriverInput.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverInput.s
+Compiling ./lib/sgInput.pas
+Compiling ./lib/sgPhysics.pas
+Compiling ./lib/sgTrace.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgTrace.s
+Compiling ./lib/sgGraphics.pas
+Compiling ./lib/sgSavePNG.pas
+Compiling ./lib/sgShared.pas
+Compiling ./lib/sgImages.pas
+Compiling ./lib/sgResources.pas
+Compiling ./lib/sgSharedUtils.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgSharedUtils.s
+Compiling ./lib/sgText.pas
+Compiling ./lib/sgUtils.pas
+Compiling ./lib/sgGeometry.pas
+Compiling ./lib/sgCamera.pas
+Compiling ./lib/sgSprites.pas
+Compiling ./lib/sgNamedIndexCollection.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgNamedIndexCollection.s
+Compiling ./lib/sgAnimations.pas
+Compiling ./lib/sgAudio.pas
+Compiling ./lib/sgDriverAudio.pas
+Compiling ./lib/sgDriverAudioSDLMixer.pas
+Compiling ./lib/sgDriverAudio.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverAudio.s
+Compiling ./lib/sdl_mixer.pas
+Assembling (pipe) ./tmp/sdl12/Release/sdl_mixer.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverAudioSDLMixer.s
+Assembling (pipe) ./tmp/sdl12/Release/sgAudio.s
+sgAnimations.pas(1162,10) Error: function header doesn't match the previous declaration "CreateAnimation(AnsiString,AnimationScript,Boolean):^AnimationData;"
+sgAnimations.pas(1446) Fatal: There were 1 errors compiling module, stopping
+Fatal: Compilation aborted
+Error: /usr/local/bin/ppc386 returned an error exitcode (normal if you did not specify a source file to be compiled)
