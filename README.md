@@ -20,7 +20,17 @@ This project makes use of the [SwinGame](http://swingame.com/) SDK.
 
 ## Usage
 
-Compile using `build.sh`. Then run using `run.sh`.
+Compile:
+
+```
+$ ./build.sh -r
+```
+
+Then open the release app:
+
+```
+$ open ./bin/Release/dart-dodger-pascal.app/
+```
 
 ## Copyright Notice
 
