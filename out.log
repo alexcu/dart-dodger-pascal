@@ -1,5 +1,5 @@
-Free Pascal Compiler version 2.6.2 [2013/02/03] for i386
-Copyright (c) 1993-2012 by Florian Klaempfl and others
+Free Pascal Compiler version 2.6.4 [2014/02/26] for i386
+Copyright (c) 1993-2014 by Florian Klaempfl and others
 Target OS: Darwin for i386
 Compiling ./src/./DartDodgerv4.pas
 Compiling ./lib/SwinGame.pas
@@ -23,21 +23,19 @@ Assembling (pipe) ./tmp/sdl12/Release/sgDriverInput.s
 Compiling ./lib/sgInput.pas
 Compiling ./lib/sgPhysics.pas
 Compiling ./lib/sgTrace.pas
-Assembling (pipe) ./tmp/sdl12/Release/sgTrace.s
-Compiling ./lib/sgGraphics.pas
-Compiling ./lib/sgSavePNG.pas
-Compiling ./lib/sgShared.pas
-Compiling ./lib/sgImages.pas
 Compiling ./lib/sgResources.pas
 Compiling ./lib/sgSharedUtils.pas
-Assembling (pipe) ./tmp/sdl12/Release/sgSharedUtils.s
-Compiling ./lib/sgText.pas
-Compiling ./lib/sgUtils.pas
-Compiling ./lib/sgGeometry.pas
+Compiling ./lib/sgShared.pas
+Compiling ./lib/sgGraphics.pas
+Compiling ./lib/sgSavePNG.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgSavePNG.s
 Compiling ./lib/sgCamera.pas
+Compiling ./lib/sgGeometry.pas
 Compiling ./lib/sgSprites.pas
 Compiling ./lib/sgNamedIndexCollection.pas
 Assembling (pipe) ./tmp/sdl12/Release/sgNamedIndexCollection.s
+Compiling ./lib/SpritePack.pas
+Assembling (pipe) ./tmp/sdl12/Release/SpritePack.s
 Compiling ./lib/sgAnimations.pas
 Compiling ./lib/sgAudio.pas
 Compiling ./lib/sgDriverAudio.pas
@@ -48,7 +46,82 @@ Compiling ./lib/sdl_mixer.pas
 Assembling (pipe) ./tmp/sdl12/Release/sdl_mixer.s
 Assembling (pipe) ./tmp/sdl12/Release/sgDriverAudioSDLMixer.s
 Assembling (pipe) ./tmp/sdl12/Release/sgAudio.s
-sgAnimations.pas(1162,10) Error: function header doesn't match the previous declaration "CreateAnimation(AnsiString,AnimationScript,Boolean):^AnimationData;"
-sgAnimations.pas(1446) Fatal: There were 1 errors compiling module, stopping
-Fatal: Compilation aborted
-Error: /usr/local/bin/ppc386 returned an error exitcode (normal if you did not specify a source file to be compiled)
+Compiling ./lib/sgImages.pas
+Compiling ./lib/sgDriverImages.pas
+Compiling ./lib/sgDriverImagesSDL.pas
+Compiling ./lib/sgDriver.pas
+Compiling ./lib/sgDriverTimer.pas
+Compiling ./lib/sgDriverTimerSDL.pas
+Compiling ./lib/sgDriverTimer.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverTimer.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverTimerSDL.s
+Compiling ./lib/sgDriverSDL.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverSDL.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriver.s
+Compiling ./lib/sdl_gfx.pas
+Assembling (pipe) ./tmp/sdl12/Release/sdl_gfx.s
+Compiling ./lib/sdl_image.pas
+Assembling (pipe) ./tmp/sdl12/Release/sdl_image.s
+Compiling ./lib/sgDriverGraphics.pas
+Compiling ./lib/sgDriverGraphicsSDL.pas
+Compiling ./lib/sgSDLUtils.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgSDLUtils.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverGraphicsSDL.s
+User defined: Using SDL 1.2 Driver
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverGraphics.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverImagesSDL.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverImages.s
+Assembling (pipe) ./tmp/sdl12/Release/sgImages.s
+Assembling (pipe) ./tmp/sdl12/Release/sgAnimations.s
+Compiling ./lib/sgTimers.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgTimers.s
+Assembling (pipe) ./tmp/sdl12/Release/sgSprites.s
+Compiling ./lib/sgUtils.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgUtils.s
+Assembling (pipe) ./tmp/sdl12/Release/sgGeometry.s
+Assembling (pipe) ./tmp/sdl12/Release/sgCamera.s
+Compiling ./lib/sgText.pas
+Compiling ./lib/sgDriverText.pas
+Compiling ./lib/sgDriverTextSDL.pas
+Compiling ./lib/sgDriverText.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverText.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverTextSDL.s
+Assembling (pipe) ./tmp/sdl12/Release/sgText.s
+Assembling (pipe) ./tmp/sdl12/Release/sgGraphics.s
+Assembling (pipe) ./tmp/sdl12/Release/sgShared.s
+Assembling (pipe) ./tmp/sdl12/Release/sgSharedUtils.s
+Compiling ./lib/sgCharacters.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgCharacters.s
+Compiling ./lib/sgUserInterface.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgUserInterface.s
+Compiling ./lib/sgMaps.pas
+Compiling ./lib/sgVectorShapes.pas
+Assembling (pipe) ./tmp/sdl12/Release/sgVectorShapes.s
+Assembling (pipe) ./tmp/sdl12/Release/sgMaps.s
+Compiling ./lib/sgNetworking.pas
+Compiling ./lib/sgDriverNetworking.pas
+Compiling ./lib/sgDriverNetworkingSDL.pas
+Compiling ./lib/sdl_net.pas
+Assembling (pipe) ./tmp/sdl12/Release/sdl_net.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverNetworkingSDL.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverNetworking.s
+Assembling (pipe) ./tmp/sdl12/Release/sgNetworking.s
+Compiling ./lib/sgArduino.pas
+Compiling ./lib/synaser.pas
+Compiling ./lib/synafpc.pas
+Assembling (pipe) ./tmp/sdl12/Release/synafpc.s
+Compiling ./lib/synautil.pas
+Assembling (pipe) ./tmp/sdl12/Release/synautil.s
+Assembling (pipe) ./tmp/sdl12/Release/synaser.s
+Assembling (pipe) ./tmp/sdl12/Release/sgArduino.s
+Assembling (pipe) ./tmp/sdl12/Release/sgResources.s
+Assembling (pipe) ./tmp/sdl12/Release/sgTrace.s
+Assembling (pipe) ./tmp/sdl12/Release/sgPhysics.s
+Assembling (pipe) ./tmp/sdl12/Release/sgInput.s
+Assembling (pipe) ./tmp/sdl12/Release/sgDriverInputSDL.s
+Assembling (pipe) ./tmp/sdl12/Release/sgInputBackend.s
+Assembling (pipe) ./tmp/sdl12/Release/sgTypes.s
+Assembling (pipe) ./tmp/sdl12/Release/SwinGame.s
+Assembling (pipe) ./tmp/sdl12/Release/DartDodgerv4.s
+Linking ./bin/Release/dart-dodger-pascal
+71876 lines compiled, 3.2 sec 

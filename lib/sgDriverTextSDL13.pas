@@ -19,7 +19,7 @@ interface
 		
 //=============================================================================		
 implementation
-	uses sgSDL13Utils, sgDriverText, sdl13_ttf, sgTypes, sgGeometry, sgShared, sdl13, sgGraphics, sgImages, sdl13_gfx, sgDriverGraphics, sgDriverGraphicsSDL13, sgDriverSDL13, sgDriverImages;
+	uses sgSDL13Utils, sgDriverText, sdl13_ttf, sgTypes, sgGeometry, sgShared, SDL2, sgGraphics, sgImages, sdl13_gfx, sgDriverGraphics, sgDriverGraphicsSDL13, sgDriverSDL13, sgDriverImages;
 	
 	const EOL = LineEnding; // from sgShared
 
@@ -58,7 +58,7 @@ implementation
       exit;
     end;
 
-    SDL_GetRGB(color, GetSurface(screen)^.format, @result.r, @result.g, @result.b);
+    SDL_GetRGB(color, GetSurface(screen)^.format, result.r, result.g, result.b);
   end;
 	
 	procedure CloseFontProcedure(fontToClose : font);
@@ -379,7 +379,7 @@ implementation
 	var
 	  surf : PSDL_Surface;
 	  texture : PSDL_Texture;
-    offset : Rectangle;
+    offset, drect : SDL_Rect;
     r, g, b, a: Byte;
 	begin
     GraphicsDriver.ColorComponents(theColor, r, g, b, a);
@@ -387,20 +387,25 @@ implementation
       
 	  // DrawDirtyScreen();
     
-    offset := RectangleFrom(0, 0, Length(theText) * 10, 10);
+    offset := NewSDLRect(0, 0, Length(theText) * 10, 10);
+    drect := offset;
+    drect.x := Round(x);
+    drect.y := Round(y);
 
     if dest = screen then
     begin
-	    surf := SDL_CreateRGBSurface(SDL_SWSURFACE, offset.width, offset.height, 32, 0, 0, 0, 0);
+	    surf := SDL_CreateRGBSurface(SDL_SWSURFACE, offset.w, offset.h, 32, 0, 0, 0, 0);
 
 	    SDL_SetColorKey(surf, SDL_SRCCOLORKEY, GraphicsDriver.RGBAColor(0, 0, 0, 0));
-		  stringColor(surf, RoundShort(x), RoundShort(y), PChar(theText), ToGfxColorProcedure(GraphicsDriver.RGBAColor(r, g, b, a)) );
+		stringColor(surf, 0, 0, PChar(theText), ToGfxColorProcedure(GraphicsDriver.RGBAColor(r, g, b, a)) );
+	    
 	    texture := SDL_CreateTextureFromSurface(PSDL13Screen(_screen)^.renderer, surf);
-		  SDL_RenderCopy(PSDL13Screen(_screen)^.renderer, texture, @offset, @offset);
+
+		SDL_RenderCopy(PSDL13Screen(_screen)^.renderer, texture, nil, @drect);
 		  
-		  SDL_DestroyTexture(texture);
-		  SDL_FreeSurface(surf);
-		end
+		SDL_DestroyTexture(texture);
+		SDL_FreeSurface(surf);
+	end
 		else
 		begin
 			StringColor(PSDL13Surface(dest^.surface)^.surface, RoundShort(x), RoundShort(y), PChar(theText), ToGfxColorProcedure(theColor) );

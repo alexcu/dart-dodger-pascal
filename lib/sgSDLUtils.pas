@@ -1,7 +1,7 @@
 unit sgSDLUtils;
 
 interface
-	uses {$IFDEF SWINGAME_SDL13}sdl13{$ELSE}sdl{$ENDIF}, sgTypes;
+	uses {$IFDEF SWINGAME_SDL13}SDL2{$ELSE}sdl{$ENDIF}, sgTypes;
 
 
 procedure PutSurfacePixel(surf : PSDL_Surface; clr: Color; x, y: Longint);
@@ -10,6 +10,7 @@ function GetSurfacePixel(surface: PSDL_Surface; x, y: Longint): Color;
 
 procedure SetNonAlphaPixels(bmp : Bitmap; surface: PSDL_Surface); 
 
+function SDL_Swap32(D: Uint32): Uint32;
 
 
 implementation
@@ -87,8 +88,25 @@ implementation
 		begin
 		  for r := 0 to bmp^.height - 1 do
 		  begin
-		    bmp^.nonTransparentPixels[c, r] := (not hasAlpha) or ((GetSurfacePixel(surface, c, r) and SDL_Swap32($000000FF)) > 0);
+		  	{$IFDEF SWINGAME_SDL13}
+		  		bmp^.nonTransparentPixels[c, r] := (not hasAlpha) or ((GetSurfacePixel(surface, c, r) and SDL_Swap32($000000FF)) > 0);
+			{$ELSE}
+				//if (c = 0) and (r = 0) then
+				//begin
+				//	WriteLn('not hasAlpha = ', not hasAlpha);
+				//	WriteLn('Color is ', GetSurfacePixel(surface, c, r));
+				//	WriteLn('Alpha is ', $000000FF shr surface^.format^.ashift);
+				//	WriteLn('Alpha shift is ', surface^.format^.ashift);
+				//end;
+
+				bmp^.nonTransparentPixels[c, r] := (not hasAlpha) or ((GetSurfacePixel(surface, c, r) and ($FF shl surface^.format^.ashift)) > 0);
+			{$ENDIF}
 		  end;
 		end;
 	end;
+
+  function SDL_Swap32(D: Uint32): Uint32;
+  begin
+    Result := ((D shl 24) or ((D shl 8) and $00FF0000) or ((D shr 8) and $0000FF00) or (D shr 24));
+  end;
 end.

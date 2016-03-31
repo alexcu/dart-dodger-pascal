@@ -1,4 +1,4 @@
-// SwinGame.pas was generated on 2013-02-20 17:03:38.470258
+// SwinGame.pas was generated on 2015-09-15 14:16:41.830171
 // 
 // This is a wrapper unit that exposes all of the SwinGame API in a single
 // location. To create a SwinGame project all you should need to use is
@@ -7,7 +7,7 @@
 unit SwinGame;
 
 interface
-uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraphics, sgImages, sgInput, sgNetworking, sgPhysics, sgResources, sgSprites, sgText, sgTimers, sgUtils, sgUserInterface;
+uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraphics, sgImages, sgInput, sgNetworking, sgPhysics, sgResources, sgSprites, sgText, sgTimers, sgUtils, sgUserInterface, sgArduino;
 
   type LongintArray = sgTypes.LongintArray;
 
@@ -83,9 +83,19 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
 
   type CollisionTestKind = sgTypes.CollisionTestKind;
 
-  type SpriteData = sgTypes.SpriteData;
+  type SpriteEventKind = sgTypes.SpriteEventKind;
 
   type Sprite = sgTypes.Sprite;
+
+  type SpriteEventHandler = sgTypes.SpriteEventHandler;
+
+  type SpriteFunction = sgTypes.SpriteFunction;
+
+  type SpriteSingleFunction = sgTypes.SpriteSingleFunction;
+
+  type SpriteEventHandlerArray = sgTypes.SpriteEventHandlerArray;
+
+  type SpriteData = sgTypes.SpriteData;
 
   type TimerData = sgTypes.TimerData;
 
@@ -159,6 +169,10 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
 
   type Connection = sgTypes.Connection;
 
+  type ArduinoData = sgTypes.ArduinoData;
+
+  type ArduinoDevice = sgTypes.ArduinoDevice;
+
   // Returns the current cell (the part of the image or sprite) of this animation.
   // This can be used to animate an image or sprite.
   function AnimationCurrentCell(anim: Animation): Longint; overload;
@@ -174,11 +188,14 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   function AnimationEnteredFrame(anim: Animation): Boolean; overload;
 
   // Returns the amount of time spent in the current frame. When this exceeds
-  // the frame's duration the animation moves to the next frame.
+  // the frames duration the animation moves to the next frame.
   function AnimationFrameTime(anim: Animation): Single; overload;
 
   // The index of the animation within the animation template that has the supplied name.
   function AnimationIndex(temp: AnimationScript; name: String): Longint; overload;
+
+  // The name of the animation currently being played.
+  function AnimationName(temp: Animation): String; overload;
 
   // The name of the animation within the animation template at the specified index.
   function AnimationName(temp: AnimationScript; idx: Longint): String; overload;
@@ -760,7 +777,7 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Draws the character's sprite with no additional functionality
   procedure DrawCharacterSprite(c: Character); overload;
 
-  // Draw Character that changes state when its velocity is 0 to be the stationary
+  // Draw Character that changes state when it's velocity is 0 to be the stationary
   // state which is specified.
   procedure DrawCharacterWithStationary(c: Character; stationaryState: Longint; state: Longint); overload;
 
@@ -795,11 +812,11 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Toggles whether or not the layer at the specified index is drawn or not
   procedure ToggleLayerVisibility(c: Character; index: Longint); overload;
 
-  // Update the animation of the character depending on its direction. Returns true
+  // Update the animation of the character depending on it's direction. Returns true
   // if the direction was changed and false if it was no changed
   function UpdateDirectionAnimation(c: Character): Boolean; overload;
 
-  // Update the animation of the character depending on its direction, including updating
+  // Update the animation of the character depending on it's direction, including updating
   //When the character's state goes stationary
   function UpdateDirectionAnimationWithStationary(c: Character; state: Longint; newState: Longint): Boolean; overload;
 
@@ -1078,6 +1095,9 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Returns True if the point ``pt`` is in the circle.
   function PointInCircle(const pt: Point2D; const c: Circle): Boolean; overload;
 
+  // Returns True if the point ``pt`` is in the circle defined by x, y, radius.
+  function PointInCircle(const pt: Point2D; x: Single; y: Single; radius: Single): Boolean; overload;
+
   // Returns True if the point ``ptX``, ``ptY`` is in the circle.
   function PointInCircle(ptX: Single; ptY: Single; cX: Single; cY: Single; radius: Single): Boolean; overload;
 
@@ -1109,6 +1129,9 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
 
   // Returns True if point ``pt`` is on the line segment ``line``.
   function PointOnLine(const pt: Point2D; const line: LineSegment): Boolean; overload;
+
+  // Returns True if point ``pt`` is on the line segment ``line``.
+  function PointOnLine(const pt: Point2D; x: Single; y: Single; endX: Single; endY: Single): Boolean; overload;
 
   // Returns True of `pt1` is at the same point as `pt2`.
   function PointOnPoint(const pt1: Point2D; const pt2: Point2D): Boolean; overload;
@@ -1373,15 +1396,450 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Clear the screen to a specified color.
   procedure ClearScreen(toColor: Color); overload;
 
+  // The color AliceBlue
+  function ColorAliceBlue(): Color; overload;
+
+  // The color AntiqueWhite
+  function ColorAntiqueWhite(): Color; overload;
+
+  // The color Aqua
+  function ColorAqua(): Color; overload;
+
+  // The color Aquamarine
+  function ColorAquamarine(): Color; overload;
+
+  // The color Azure
+  function ColorAzure(): Color; overload;
+
+  // The color Beige
+  function ColorBeige(): Color; overload;
+
+  // The color Bisque
+  function ColorBisque(): Color; overload;
+
+  // The color Black
+  function ColorBlack(): Color; overload;
+
+  // The color BlanchedAlmond
+  function ColorBlanchedAlmond(): Color; overload;
+
+  // The color Blue
+  function ColorBlue(): Color; overload;
+
+  // The color BlueViolet
+  function ColorBlueViolet(): Color; overload;
+
+  // The color Green
+  function ColorBrightGreen(): Color; overload;
+
+  // The color Brown
+  function ColorBrown(): Color; overload;
+
+  // The color BurlyWood
+  function ColorBurlyWood(): Color; overload;
+
+  // The color CadetBlue
+  function ColorCadetBlue(): Color; overload;
+
+  // The color Chartreuse
+  function ColorChartreuse(): Color; overload;
+
+  // The color Chocolate
+  function ColorChocolate(): Color; overload;
+
   // Gets a color given its RGBA components.
   procedure ColorComponents(c: Color; out r: Byte; out g: Byte; out b: Byte; out a: Byte); overload;
+
+  // The color Coral
+  function ColorCoral(): Color; overload;
+
+  // The color CornflowerBlue
+  function ColorCornflowerBlue(): Color; overload;
+
+  // The color Cornsilk
+  function ColorCornsilk(): Color; overload;
+
+  // The color Crimson
+  function ColorCrimson(): Color; overload;
+
+  // The color Cyan
+  function ColorCyan(): Color; overload;
+
+  // The color DarkBlue
+  function ColorDarkBlue(): Color; overload;
+
+  // The color DarkCyan
+  function ColorDarkCyan(): Color; overload;
+
+  // The color DarkGoldenrod
+  function ColorDarkGoldenrod(): Color; overload;
+
+  // The color DarkGray
+  function ColorDarkGray(): Color; overload;
+
+  // The color DarkGreen
+  function ColorDarkGreen(): Color; overload;
+
+  // The color DarkKhaki
+  function ColorDarkKhaki(): Color; overload;
+
+  // The color DarkMagenta
+  function ColorDarkMagenta(): Color; overload;
+
+  // The color DarkOliveGreen
+  function ColorDarkOliveGreen(): Color; overload;
+
+  // The color DarkOrange
+  function ColorDarkOrange(): Color; overload;
+
+  // The color DarkOrchid
+  function ColorDarkOrchid(): Color; overload;
+
+  // The color DarkRed
+  function ColorDarkRed(): Color; overload;
+
+  // The color DarkSalmon
+  function ColorDarkSalmon(): Color; overload;
+
+  // The color DarkSeaGreen
+  function ColorDarkSeaGreen(): Color; overload;
+
+  // The color DarkSlateBlue
+  function ColorDarkSlateBlue(): Color; overload;
+
+  // The color DarkSlateGray
+  function ColorDarkSlateGray(): Color; overload;
+
+  // The color DarkTurquoise
+  function ColorDarkTurquoise(): Color; overload;
+
+  // The color DarkViolet
+  function ColorDarkViolet(): Color; overload;
+
+  // The color DeepPink
+  function ColorDeepPink(): Color; overload;
+
+  // The color DeepSkyBlue
+  function ColorDeepSkyBlue(): Color; overload;
+
+  // The color DimGray
+  function ColorDimGray(): Color; overload;
+
+  // The color DodgerBlue
+  function ColorDodgerBlue(): Color; overload;
+
+  // The color Firebrick
+  function ColorFirebrick(): Color; overload;
+
+  // The color FloralWhite
+  function ColorFloralWhite(): Color; overload;
+
+  // The color ForestGreen
+  function ColorForestGreen(): Color; overload;
 
   // Maps a color from a given bitmap. This is used when determining color
   // keys for transparent images.
   function ColorFrom(bmp: Bitmap; apiColor: Color): Color; overload;
 
+  // The color Fuchsia
+  function ColorFuchsia(): Color; overload;
+
+  // The color Gainsboro
+  function ColorGainsboro(): Color; overload;
+
+  // The color GhostWhite
+  function ColorGhostWhite(): Color; overload;
+
+  // The color Gold
+  function ColorGold(): Color; overload;
+
+  // The color Goldenrod
+  function ColorGoldenrod(): Color; overload;
+
+  // The color Gray
+  function ColorGray(): Color; overload;
+
+  // The color Green
+  function ColorGreen(): Color; overload;
+
+  // The color GreenYellow
+  function ColorGreenYellow(): Color; overload;
+
+  // The color Grey
+  function ColorGrey(): Color; overload;
+
+  // The color Honeydew
+  function ColorHoneydew(): Color; overload;
+
+  // The color HotPink
+  function ColorHotPink(): Color; overload;
+
+  // The color IndianRed
+  function ColorIndianRed(): Color; overload;
+
+  // The color Indigo
+  function ColorIndigo(): Color; overload;
+
+  // The color Ivory
+  function ColorIvory(): Color; overload;
+
+  // The color Khaki
+  function ColorKhaki(): Color; overload;
+
+  // The color Lavender
+  function ColorLavender(): Color; overload;
+
+  // The color LavenderBlush
+  function ColorLavenderBlush(): Color; overload;
+
+  // The color LawnGreen
+  function ColorLawnGreen(): Color; overload;
+
+  // The color LemonChiffon
+  function ColorLemonChiffon(): Color; overload;
+
+  // The color LightBlue
+  function ColorLightBlue(): Color; overload;
+
+  // The color LightCoral
+  function ColorLightCoral(): Color; overload;
+
+  // The color LightCyan
+  function ColorLightCyan(): Color; overload;
+
+  // The color LightGoldenrodYellow
+  function ColorLightGoldenrodYellow(): Color; overload;
+
+  // The color LightGray
+  function ColorLightGray(): Color; overload;
+
+  // The color LightGreen
+  function ColorLightGreen(): Color; overload;
+
+  // The color Transparent
+  function ColorLightGrey(): Color; overload;
+
+  // The color LightPink
+  function ColorLightPink(): Color; overload;
+
+  // The color LightSalmon
+  function ColorLightSalmon(): Color; overload;
+
+  // The color LightSeaGreen
+  function ColorLightSeaGreen(): Color; overload;
+
+  // The color LightSkyBlue
+  function ColorLightSkyBlue(): Color; overload;
+
+  // The color LightSlateGray
+  function ColorLightSlateGray(): Color; overload;
+
+  // The color LightSteelBlue
+  function ColorLightSteelBlue(): Color; overload;
+
+  // The color LightYellow
+  function ColorLightYellow(): Color; overload;
+
+  // The color Lime
+  function ColorLime(): Color; overload;
+
+  // The color LimeGreen
+  function ColorLimeGreen(): Color; overload;
+
+  // The color Linen
+  function ColorLinen(): Color; overload;
+
+  // The color Magenta
+  function ColorMagenta(): Color; overload;
+
+  // The color Maroon
+  function ColorMaroon(): Color; overload;
+
+  // The color MediumAquamarine
+  function ColorMediumAquamarine(): Color; overload;
+
+  // The color MediumBlue
+  function ColorMediumBlue(): Color; overload;
+
+  // The color MediumOrchid
+  function ColorMediumOrchid(): Color; overload;
+
+  // The color MediumPurple
+  function ColorMediumPurple(): Color; overload;
+
+  // The color MediumSeaGreen
+  function ColorMediumSeaGreen(): Color; overload;
+
+  // The color MediumSlateBlue
+  function ColorMediumSlateBlue(): Color; overload;
+
+  // The color MediumSpringGreen
+  function ColorMediumSpringGreen(): Color; overload;
+
+  // The color MediumTurquoise
+  function ColorMediumTurquoise(): Color; overload;
+
+  // The color MediumVioletRed
+  function ColorMediumVioletRed(): Color; overload;
+
+  // The color MidnightBlue
+  function ColorMidnightBlue(): Color; overload;
+
+  // The color MintCream
+  function ColorMintCream(): Color; overload;
+
+  // The color MistyRose
+  function ColorMistyRose(): Color; overload;
+
+  // The color Moccasin
+  function ColorMoccasin(): Color; overload;
+
+  // The color NavajoWhite
+  function ColorNavajoWhite(): Color; overload;
+
+  // The color Navy
+  function ColorNavy(): Color; overload;
+
+  // The color OldLace
+  function ColorOldLace(): Color; overload;
+
+  // The color Olive
+  function ColorOlive(): Color; overload;
+
+  // The color OliveDrab
+  function ColorOliveDrab(): Color; overload;
+
+  // The color Orange
+  function ColorOrange(): Color; overload;
+
+  // The color OrangeRed
+  function ColorOrangeRed(): Color; overload;
+
+  // The color Orchid
+  function ColorOrchid(): Color; overload;
+
+  // The color PaleGoldenrod
+  function ColorPaleGoldenrod(): Color; overload;
+
+  // The color PaleGreen
+  function ColorPaleGreen(): Color; overload;
+
+  // The color PaleTurquoise
+  function ColorPaleTurquoise(): Color; overload;
+
+  // The color PaleVioletRed
+  function ColorPaleVioletRed(): Color; overload;
+
+  // The color PapayaWhip
+  function ColorPapayaWhip(): Color; overload;
+
+  // The color PeachPuff
+  function ColorPeachPuff(): Color; overload;
+
+  // The color Peru
+  function ColorPeru(): Color; overload;
+
+  // The color Pink
+  function ColorPink(): Color; overload;
+
+  // The color Plum
+  function ColorPlum(): Color; overload;
+
+  // The color PowderBlue
+  function ColorPowderBlue(): Color; overload;
+
+  // The color Purple
+  function ColorPurple(): Color; overload;
+
+  // The color Red
+  function ColorRed(): Color; overload;
+
+  // The color RosyBrown
+  function ColorRosyBrown(): Color; overload;
+
+  // The color RoyalBlue
+  function ColorRoyalBlue(): Color; overload;
+
+  // The color SaddleBrown
+  function ColorSaddleBrown(): Color; overload;
+
+  // The color Salmon
+  function ColorSalmon(): Color; overload;
+
+  // The color SandyBrown
+  function ColorSandyBrown(): Color; overload;
+
+  // The color SeaGreen
+  function ColorSeaGreen(): Color; overload;
+
+  // The color SeaShell
+  function ColorSeaShell(): Color; overload;
+
+  // The color Sienna
+  function ColorSienna(): Color; overload;
+
+  // The color Silver
+  function ColorSilver(): Color; overload;
+
+  // The color SkyBlue
+  function ColorSkyBlue(): Color; overload;
+
+  // The color SlateBlue
+  function ColorSlateBlue(): Color; overload;
+
+  // The color SlateGray
+  function ColorSlateGray(): Color; overload;
+
+  // The color Snow
+  function ColorSnow(): Color; overload;
+
+  // The color SpringGreen
+  function ColorSpringGreen(): Color; overload;
+
+  // The color SteelBlue
+  function ColorSteelBlue(): Color; overload;
+
+  // The color Swinburne Red
+  function ColorSwinburneRed(): Color; overload;
+
+  // The color Tan
+  function ColorTan(): Color; overload;
+
+  // The color Teal
+  function ColorTeal(): Color; overload;
+
+  // The color Thistle
+  function ColorThistle(): Color; overload;
+
   // returns color to string.
   function ColorToString(c: Color): String; overload;
+
+  // The color Tomato
+  function ColorTomato(): Color; overload;
+
+  // The color Transparent
+  function ColorTransparent(): Color; overload;
+
+  // The color Turquoise
+  function ColorTurquoise(): Color; overload;
+
+  // The color Violet
+  function ColorViolet(): Color; overload;
+
+  // The color Wheat
+  function ColorWheat(): Color; overload;
+
+  // The color White
+  function ColorWhite(): Color; overload;
+
+  // The color WhiteSmoke
+  function ColorWhiteSmoke(): Color; overload;
+
+  // The color Yellow
+  function ColorYellow(): Color; overload;
+
+  // The color YellowGreen
+  function ColorYellowGreen(): Color; overload;
 
   // Returns the rectangle of the currentl clip of bitmap
   function CurrentClip(): Rectangle; overload;
@@ -1573,6 +2031,9 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
 
   // Draw a rectangle on the screen (filled or outline).
   procedure DrawRectangleOnScreen(clr: Color; filled: Boolean; xPos: Longint; yPos: Longint; width: Longint; height: Longint); overload;
+
+  // Draw a thick line in the game.
+  procedure DrawThickLine(clr: Color; xPosStart: Single; yPosStart: Single; xPosEnd: Single; yPosEnd: Single; width: Single); overload;
 
   // Draw a triangle in the game.
   procedure DrawTriangle(clr: Color; x1: Single; y1: Single; x2: Single; y2: Single; x3: Single; y3: Single); overload;
@@ -2670,6 +3131,12 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // resources.
   procedure SetAppPath(path: String; withExe: Boolean); overload;
 
+  // Call the supplied function for all sprites.
+  procedure CallForAllSprites(fn: SpriteFunction); overload;
+
+  // Register a procedure to be called when an events occur on any sprite.
+  procedure CallOnSpriteEvent(handler: SpriteEventHandler); overload;
+
   // Returns the center point of the passed in Sprite. This is based on the Sprite's 
   // Position, Width and Height.
   function CenterPoint(s: Sprite): Point2D; overload;
@@ -2702,6 +3169,10 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   //
   // This version of the constructor will assign a default name to the sprite for resource management purposes.
   function CreateSprite(layer: Bitmap; pt: Point2D): Sprite; overload;
+
+  // Creates a sprite. The bitmapName is used to indicate the bitmap the sprite will use, and the 
+  // animationName is used to indicate which AnimationScript to use.
+  function CreateSprite(bitmapName: String; animationName: String): Sprite; overload;
 
   // Creates a sprite for the passed in bitmap image. The sprite will use the cell information within the 
   // sprite if it is animated at a later stage. This version of CreateSprite will initialise the sprite to use
@@ -2802,6 +3273,18 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // pixel level collisions, no animation, the layer names 'layer1', 'layer2',... .
   function CreateSprite(name: String; const layers: BitmapArray; const layerNames: StringArray; ani: AnimationScript): Sprite; overload;
 
+  // Create a new SpritePack with a given name. This pack can then be 
+  // selected and used to control which sprites are drawn/updated in
+  // the calls to DrawAllSprites and UpdateAllSprites.
+  procedure CreateSpritePack(name: String); overload;
+
+  // Returns the name of the currently selected SpritePack.
+  function CurrentSpritePack(): String; overload;
+
+  // Draws all of the sprites in the current Sprite pack. Packs can be
+  // switched to select between different sets of sprites.
+  procedure DrawAllSprites(); overload;
+
   // Draws the sprite at its location in the world. This is effected by the
   // position of the camera and the sprites current location.
   //
@@ -2828,6 +3311,9 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // This checks against all sprites, those loaded without a name
   // are assigned a default.
   function HasSprite(name: String): Boolean; overload;
+
+  // Indicates if a given SpritePack has already been created.
+  function HasSpritePack(name: String): Boolean; overload;
 
   // Moves the sprite as indicated by its velocity. You can call this directly ot 
   // alternatively, this action is performed when the sprite is updated using
@@ -2861,6 +3347,11 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // specified ``name``.
   procedure ReleaseSprite(name: String); overload;
 
+  // Selects the named SpritePack (if it has been created). The
+  // selected SpritePack determines which sprites are drawn and updated
+  // with the DrawAllSprites and UpdateAllSprites code.
+  procedure SelectSpritePack(name: String); overload;
+
   // Adds a new layer to the sprite.
   function SpriteAddLayer(s: Sprite; newLayer: Bitmap; layerName: String): Longint; overload;
 
@@ -2880,11 +3371,17 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Indicates if the sprites animation has ended.
   function SpriteAnimationHasEnded(s: Sprite): Boolean; overload;
 
+  // Returns the name of the Sprite's current animation.
+  function SpriteAnimationName(s: Sprite): String; overload;
+
   // Sends the layer specified forward in the visible layer order.
   procedure SpriteBringLayerForward(s: Sprite; visibleLayer: Longint); overload;
 
   // Sends the layer specified to the front in the visible layer order.
   procedure SpriteBringLayerToFront(s: Sprite; visibleLayer: Longint); overload;
+
+  // Register a procedure to call when events occur on the sprite.
+  procedure SpriteCallOnEvent(s: Sprite; handler: SpriteEventHandler); overload;
 
   // Gets a circle in the bounds of the base layer of the indicated sprite.
   function SpriteCircle(s: Sprite): Circle; overload;
@@ -2984,6 +3481,11 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Physics. The mass of two colliding sprites will determine the relative
   // velocitys after the collision.
   function SpriteMass(s: Sprite): Single; overload;
+
+  // This procedure starts the sprite moving to the indicated
+  // destination point, over a specified number of seconds. When the 
+  // sprite arrives it will raise the SpriteArrived event.
+  procedure SpriteMoveTo(s: Sprite; const pt: Point2D; takingSeconds: Longint); overload;
 
   // Returns the name of the sprite. This name is used for resource management
   // and can be used to interact with the sprite in various routines.
@@ -3122,6 +3624,10 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // if the first cell of the animation has a sound.
   procedure SpriteStartAnimation(s: Sprite; idx: Longint; withSound: Boolean); overload;
 
+  // Removes an event handler from the sprite, stopping events from this 
+  // Sprite calling the indicated method.
+  procedure SpriteStopCallingOnEvent(s: Sprite; handler: SpriteEventHandler); overload;
+
   // Toggle the visibility of the specified layer of the sprite.
   procedure SpriteToggleLayerVisible(s: Sprite; id: Longint); overload;
 
@@ -3168,6 +3674,16 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // Returns the Y position of the Sprite.
   function SpriteY(s: Sprite): Single; overload;
 
+  // Removes an global event handler, stopping events calling the indicated procedure.
+  procedure StopCallingOnSpriteEvent(handler: SpriteEventHandler); overload;
+
+  // Update all of the sprites in the current Sprite pack.
+  procedure UpdateAllSprites(); overload;
+
+  // Update all of the sprites in the current Sprite pack, passing in a
+  // percentage value to indicate the percentage to update.
+  procedure UpdateAllSprites(pct: Single); overload;
+
   // Update the position and animation details of the Sprite.
   // This will play a sound effect if the new cell of the animation
   // has a sound.
@@ -3195,16 +3711,16 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // has a sound.
   procedure UpdateSpriteAnimation(s: Sprite); overload;
 
+  // Update the animation details of the Sprite.
+  // This will play a sound effect if the new cell of the animation
+  // has a sound and withSound is true.
+  procedure UpdateSpriteAnimation(s: Sprite; withSound: Boolean); overload;
+
   // Update the animation details of the Sprite by a 
   // given percentage of a single unit of movement/animation.
   // This will play a sound effect if the new cell of the animation
   // has a sound.
   procedure UpdateSpriteAnimation(s: Sprite; pct: Single); overload;
-
-  // Update the animation details of the Sprite.
-  // This will play a sound effect if the new cell of the animation
-  // has a sound and withSound is true.
-  procedure UpdateSpriteAnimation(s: Sprite; withSound: Boolean); overload;
 
   // Update the position and animation details of the Sprite by a 
   // given percentage of a single unit of movement/animation.
@@ -3574,6 +4090,10 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // will continue to return the same time.
   procedure PauseTimer(toPause: Timer); overload;
 
+  // Pause the timer, getting ticks from a paused timer
+  // will continue to return the same time.
+  procedure PauseTimer(name: String); overload;
+
   // Releases all of the timers that have been loaded.
   procedure ReleaseAllTimers(); overload;
 
@@ -3582,10 +4102,19 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   procedure ReleaseTimer(name: String); overload;
 
   // Resets the time of a given timer
+  procedure ResetTimer(name: String); overload;
+
+  // Resets the time of a given timer
   procedure ResetTimer(tmr: Timer); overload;
 
   // Resumes a paused timer.
+  procedure ResumeTimer(name: String); overload;
+
+  // Resumes a paused timer.
   procedure ResumeTimer(toUnpause: Timer); overload;
+
+  // Start a timer recording the time that has passed.
+  procedure StartTimer(name: String); overload;
 
   // Start a timer recording the time that has passed.
   procedure StartTimer(toStart: Timer); overload;
@@ -3594,8 +4123,17 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // recall start to begin the timer ticking again.
   procedure StopTimer(toStop: Timer); overload;
 
+  // Stop the timer. The time is reset to 0 and you must
+  // recall start to begin the timer ticking again.
+  procedure StopTimer(name: String); overload;
+
   // Get the timer created with the indicated named.
   function TimerNamed(name: String): Timer; overload;
+
+  // Gets the number of ticks (milliseconds) that have passed since the timer
+  // was started/reset. When paused the timer's ticks will not advance until
+  // the timer is once again resumed.
+  function TimerTicks(name: String): Longword; overload;
 
   // Gets the number of ticks (milliseconds) that have passed since the timer
   // was started/reset. When paused the timer's ticks will not advance until
@@ -4290,40 +4828,69 @@ uses sgTypes, sgAnimations, sgAudio, sgCamera, sgCharacters, sgGeometry, sgGraph
   // UpdateInterface main loop, checks the draggable, checks the region clicked, updates the interface
   procedure UpdateInterface(); overload;
 
-Procedure LoadDefaultColors();
+  // Returns the ArduinoDevice with the indicated name.
+  function ArduinoDeviceNamed(name: String): ArduinoDevice; overload;
 
-var
-      ColorWhite :        Color = $FFFFFFFF;
-      ColorGreen :        Color = $FF00FF00;
-      ColorBlue :         Color = $FF0000FF;
-      ColorBlack :        Color = $FF000000;
-      ColorRed :          Color = $FFFF0000;
-      ColorYellow :       Color = $FFFFFF00;
-      ColorPink :         Color = $FFFF1493;
-      ColorTurquoise :    Color = $FF00CED1;
-      ColorGrey :         Color = $FF808080;
-      ColorMagenta :      Color = $FF00FFFF;
-      ColorTransparent :  Color = $00000000;
-      ColorLightGrey :    Color = $FFC8C8C8;
+  // Returns true if there is data waiting to be read from the device.
+  function ArduinoHasData(dev: ArduinoDevice): Boolean; overload;
+
+  // Read a Byte from the ArduinoDevice. Has a short
+  // timeout and returns 0 if no byte is read within the given time.
+  function ArduinoReadByte(dev: ArduinoDevice): Byte; overload;
+
+  // Reads a byte from the ArduinoDevice, with the given timeout in milliseconds.
+  // Returns 0 if no byte is read within the given time.
+  function ArduinoReadByte(dev: ArduinoDevice; timeout: Longint): Byte; overload;
+
+  // Reads a line of text from the ArduinoDevice. This
+  // returns an empty string if nothing is read within a
+  // few milliseconds.
+  function ArduinoReadLine(dev: ArduinoDevice): String; overload;
+
+  // Reads a line of text from the ArduinoDevice, within a 
+  // specified amount of time.
+  function ArduinoReadLine(dev: ArduinoDevice; timeout: Longint): String; overload;
+
+  // Send a byte value to the arduino device.
+  procedure ArduinoSendByte(dev: ArduinoDevice; value: Byte); overload;
+
+  // Send a string value to the arduino device.
+  procedure ArduinoSendString(dev: ArduinoDevice; value: String); overload;
+
+  // Send a string value to the arduino device, along with a newline
+  // so the arduino can identify the end of the sent data.
+  procedure ArduinoSendStringLine(dev: ArduinoDevice; value: String); overload;
+
+  // Creates an Arduino device at the specified port, with
+  // the indicated baud. The name of the device matches its port.
+  function CreateArduinoDevice(port: String; baud: Longint): ArduinoDevice; overload;
+
+  // Creates an Arduino device with the given name, 
+  // at the specified port, with the indicated baud.
+  function CreateArduinoDevice(name: String; port: String; baud: Longint): ArduinoDevice; overload;
+
+  // Close the connection to the Arduino Device and dispose
+  // of the resources associated with the Device.
+  procedure FreeArduinoDevice(var dev: ArduinoDevice); overload;
+
+  // Does an ArduinoDevice exist with the indicated name?
+  function HasArduinoDevice(name: String): Boolean; overload;
+
+  // Release all of the ArduinoDevices
+  procedure ReleaseAllArduinoDevices(); overload;
+
+  // Release the ArduinoDevice with the indicated name.
+  procedure ReleaseArduinoDevice(name: String); overload;
+
+
+	procedure LoadDefaultColors();
 
 implementation
 
-  procedure LoadDefaultColors();
-  begin
-      ColorWhite :=         sgGraphics.ColorWhite;
-      ColorGreen :=         sgGraphics.ColorGreen;
-      ColorBlue :=          sgGraphics.ColorBlue ;
-      ColorBlack :=         sgGraphics.ColorBlack;
-      ColorRed :=           sgGraphics.ColorRed  ;
-      ColorYellow :=        sgGraphics.ColorYellow;
-      ColorPink :=          sgGraphics.ColorPink;
-      ColorTurquoise :=     sgGraphics.ColorTurquoise;
-      ColorGrey :=          sgGraphics.ColorGrey;
-      ColorMagenta :=       sgGraphics.ColorMagenta;
-      ColorTransparent :=   sgGraphics.ColorTransparent;
-      ColorLightGrey :=     sgGraphics.ColorLightGrey;
-  end;
-    
+	procedure LoadDefaultColors();
+	begin
+	end;
+
   function AnimationCurrentCell(anim: Animation): Longint; overload;
   begin
     result := sgAnimations.AnimationCurrentCell(anim);
@@ -4352,6 +4919,11 @@ implementation
   function AnimationIndex(temp: AnimationScript; name: String): Longint; overload;
   begin
     result := sgAnimations.AnimationIndex(temp,name);
+  end;
+
+  function AnimationName(temp: Animation): String; overload;
+  begin
+    result := sgAnimations.AnimationName(temp);
   end;
 
   function AnimationName(temp: AnimationScript; idx: Longint): String; overload;
@@ -5459,6 +6031,11 @@ implementation
     result := sgGeometry.PointInCircle(pt,c);
   end;
 
+  function PointInCircle(const pt: Point2D; x: Single; y: Single; radius: Single): Boolean; overload;
+  begin
+    result := sgGeometry.PointInCircle(pt,x,y,radius);
+  end;
+
   function PointInCircle(ptX: Single; ptY: Single; cX: Single; cY: Single; radius: Single): Boolean; overload;
   begin
     result := sgGeometry.PointInCircle(ptX,ptY,cX,cY,radius);
@@ -5502,6 +6079,11 @@ implementation
   function PointOnLine(const pt: Point2D; const line: LineSegment): Boolean; overload;
   begin
     result := sgGeometry.PointOnLine(pt,line);
+  end;
+
+  function PointOnLine(const pt: Point2D; x: Single; y: Single; endX: Single; endY: Single): Boolean; overload;
+  begin
+    result := sgGeometry.PointOnLine(pt,x,y,endX,endY);
   end;
 
   function PointOnPoint(const pt1: Point2D; const pt2: Point2D): Boolean; overload;
@@ -5904,9 +6486,239 @@ implementation
     sgGraphics.ClearScreen(toColor);
   end;
 
+  function ColorAliceBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorAliceBlue();
+  end;
+
+  function ColorAntiqueWhite(): Color; overload;
+  begin
+    result := sgGraphics.ColorAntiqueWhite();
+  end;
+
+  function ColorAqua(): Color; overload;
+  begin
+    result := sgGraphics.ColorAqua();
+  end;
+
+  function ColorAquamarine(): Color; overload;
+  begin
+    result := sgGraphics.ColorAquamarine();
+  end;
+
+  function ColorAzure(): Color; overload;
+  begin
+    result := sgGraphics.ColorAzure();
+  end;
+
+  function ColorBeige(): Color; overload;
+  begin
+    result := sgGraphics.ColorBeige();
+  end;
+
+  function ColorBisque(): Color; overload;
+  begin
+    result := sgGraphics.ColorBisque();
+  end;
+
+  function ColorBlack(): Color; overload;
+  begin
+    result := sgGraphics.ColorBlack();
+  end;
+
+  function ColorBlanchedAlmond(): Color; overload;
+  begin
+    result := sgGraphics.ColorBlanchedAlmond();
+  end;
+
+  function ColorBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorBlue();
+  end;
+
+  function ColorBlueViolet(): Color; overload;
+  begin
+    result := sgGraphics.ColorBlueViolet();
+  end;
+
+  function ColorBrightGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorBrightGreen();
+  end;
+
+  function ColorBrown(): Color; overload;
+  begin
+    result := sgGraphics.ColorBrown();
+  end;
+
+  function ColorBurlyWood(): Color; overload;
+  begin
+    result := sgGraphics.ColorBurlyWood();
+  end;
+
+  function ColorCadetBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorCadetBlue();
+  end;
+
+  function ColorChartreuse(): Color; overload;
+  begin
+    result := sgGraphics.ColorChartreuse();
+  end;
+
+  function ColorChocolate(): Color; overload;
+  begin
+    result := sgGraphics.ColorChocolate();
+  end;
+
   procedure ColorComponents(c: Color; out r: Byte; out g: Byte; out b: Byte; out a: Byte); overload;
   begin
     sgGraphics.ColorComponents(c,r,g,b,a);
+  end;
+
+  function ColorCoral(): Color; overload;
+  begin
+    result := sgGraphics.ColorCoral();
+  end;
+
+  function ColorCornflowerBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorCornflowerBlue();
+  end;
+
+  function ColorCornsilk(): Color; overload;
+  begin
+    result := sgGraphics.ColorCornsilk();
+  end;
+
+  function ColorCrimson(): Color; overload;
+  begin
+    result := sgGraphics.ColorCrimson();
+  end;
+
+  function ColorCyan(): Color; overload;
+  begin
+    result := sgGraphics.ColorCyan();
+  end;
+
+  function ColorDarkBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkBlue();
+  end;
+
+  function ColorDarkCyan(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkCyan();
+  end;
+
+  function ColorDarkGoldenrod(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkGoldenrod();
+  end;
+
+  function ColorDarkGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkGray();
+  end;
+
+  function ColorDarkGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkGreen();
+  end;
+
+  function ColorDarkKhaki(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkKhaki();
+  end;
+
+  function ColorDarkMagenta(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkMagenta();
+  end;
+
+  function ColorDarkOliveGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkOliveGreen();
+  end;
+
+  function ColorDarkOrange(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkOrange();
+  end;
+
+  function ColorDarkOrchid(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkOrchid();
+  end;
+
+  function ColorDarkRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkRed();
+  end;
+
+  function ColorDarkSalmon(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkSalmon();
+  end;
+
+  function ColorDarkSeaGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkSeaGreen();
+  end;
+
+  function ColorDarkSlateBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkSlateBlue();
+  end;
+
+  function ColorDarkSlateGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkSlateGray();
+  end;
+
+  function ColorDarkTurquoise(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkTurquoise();
+  end;
+
+  function ColorDarkViolet(): Color; overload;
+  begin
+    result := sgGraphics.ColorDarkViolet();
+  end;
+
+  function ColorDeepPink(): Color; overload;
+  begin
+    result := sgGraphics.ColorDeepPink();
+  end;
+
+  function ColorDeepSkyBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorDeepSkyBlue();
+  end;
+
+  function ColorDimGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorDimGray();
+  end;
+
+  function ColorDodgerBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorDodgerBlue();
+  end;
+
+  function ColorFirebrick(): Color; overload;
+  begin
+    result := sgGraphics.ColorFirebrick();
+  end;
+
+  function ColorFloralWhite(): Color; overload;
+  begin
+    result := sgGraphics.ColorFloralWhite();
+  end;
+
+  function ColorForestGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorForestGreen();
   end;
 
   function ColorFrom(bmp: Bitmap; apiColor: Color): Color; overload;
@@ -5914,9 +6726,504 @@ implementation
     result := sgGraphics.ColorFrom(bmp,apiColor);
   end;
 
+  function ColorFuchsia(): Color; overload;
+  begin
+    result := sgGraphics.ColorFuchsia();
+  end;
+
+  function ColorGainsboro(): Color; overload;
+  begin
+    result := sgGraphics.ColorGainsboro();
+  end;
+
+  function ColorGhostWhite(): Color; overload;
+  begin
+    result := sgGraphics.ColorGhostWhite();
+  end;
+
+  function ColorGold(): Color; overload;
+  begin
+    result := sgGraphics.ColorGold();
+  end;
+
+  function ColorGoldenrod(): Color; overload;
+  begin
+    result := sgGraphics.ColorGoldenrod();
+  end;
+
+  function ColorGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorGray();
+  end;
+
+  function ColorGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorGreen();
+  end;
+
+  function ColorGreenYellow(): Color; overload;
+  begin
+    result := sgGraphics.ColorGreenYellow();
+  end;
+
+  function ColorGrey(): Color; overload;
+  begin
+    result := sgGraphics.ColorGrey();
+  end;
+
+  function ColorHoneydew(): Color; overload;
+  begin
+    result := sgGraphics.ColorHoneydew();
+  end;
+
+  function ColorHotPink(): Color; overload;
+  begin
+    result := sgGraphics.ColorHotPink();
+  end;
+
+  function ColorIndianRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorIndianRed();
+  end;
+
+  function ColorIndigo(): Color; overload;
+  begin
+    result := sgGraphics.ColorIndigo();
+  end;
+
+  function ColorIvory(): Color; overload;
+  begin
+    result := sgGraphics.ColorIvory();
+  end;
+
+  function ColorKhaki(): Color; overload;
+  begin
+    result := sgGraphics.ColorKhaki();
+  end;
+
+  function ColorLavender(): Color; overload;
+  begin
+    result := sgGraphics.ColorLavender();
+  end;
+
+  function ColorLavenderBlush(): Color; overload;
+  begin
+    result := sgGraphics.ColorLavenderBlush();
+  end;
+
+  function ColorLawnGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorLawnGreen();
+  end;
+
+  function ColorLemonChiffon(): Color; overload;
+  begin
+    result := sgGraphics.ColorLemonChiffon();
+  end;
+
+  function ColorLightBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightBlue();
+  end;
+
+  function ColorLightCoral(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightCoral();
+  end;
+
+  function ColorLightCyan(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightCyan();
+  end;
+
+  function ColorLightGoldenrodYellow(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightGoldenrodYellow();
+  end;
+
+  function ColorLightGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightGray();
+  end;
+
+  function ColorLightGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightGreen();
+  end;
+
+  function ColorLightGrey(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightGrey();
+  end;
+
+  function ColorLightPink(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightPink();
+  end;
+
+  function ColorLightSalmon(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightSalmon();
+  end;
+
+  function ColorLightSeaGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightSeaGreen();
+  end;
+
+  function ColorLightSkyBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightSkyBlue();
+  end;
+
+  function ColorLightSlateGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightSlateGray();
+  end;
+
+  function ColorLightSteelBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightSteelBlue();
+  end;
+
+  function ColorLightYellow(): Color; overload;
+  begin
+    result := sgGraphics.ColorLightYellow();
+  end;
+
+  function ColorLime(): Color; overload;
+  begin
+    result := sgGraphics.ColorLime();
+  end;
+
+  function ColorLimeGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorLimeGreen();
+  end;
+
+  function ColorLinen(): Color; overload;
+  begin
+    result := sgGraphics.ColorLinen();
+  end;
+
+  function ColorMagenta(): Color; overload;
+  begin
+    result := sgGraphics.ColorMagenta();
+  end;
+
+  function ColorMaroon(): Color; overload;
+  begin
+    result := sgGraphics.ColorMaroon();
+  end;
+
+  function ColorMediumAquamarine(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumAquamarine();
+  end;
+
+  function ColorMediumBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumBlue();
+  end;
+
+  function ColorMediumOrchid(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumOrchid();
+  end;
+
+  function ColorMediumPurple(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumPurple();
+  end;
+
+  function ColorMediumSeaGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumSeaGreen();
+  end;
+
+  function ColorMediumSlateBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumSlateBlue();
+  end;
+
+  function ColorMediumSpringGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumSpringGreen();
+  end;
+
+  function ColorMediumTurquoise(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumTurquoise();
+  end;
+
+  function ColorMediumVioletRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorMediumVioletRed();
+  end;
+
+  function ColorMidnightBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorMidnightBlue();
+  end;
+
+  function ColorMintCream(): Color; overload;
+  begin
+    result := sgGraphics.ColorMintCream();
+  end;
+
+  function ColorMistyRose(): Color; overload;
+  begin
+    result := sgGraphics.ColorMistyRose();
+  end;
+
+  function ColorMoccasin(): Color; overload;
+  begin
+    result := sgGraphics.ColorMoccasin();
+  end;
+
+  function ColorNavajoWhite(): Color; overload;
+  begin
+    result := sgGraphics.ColorNavajoWhite();
+  end;
+
+  function ColorNavy(): Color; overload;
+  begin
+    result := sgGraphics.ColorNavy();
+  end;
+
+  function ColorOldLace(): Color; overload;
+  begin
+    result := sgGraphics.ColorOldLace();
+  end;
+
+  function ColorOlive(): Color; overload;
+  begin
+    result := sgGraphics.ColorOlive();
+  end;
+
+  function ColorOliveDrab(): Color; overload;
+  begin
+    result := sgGraphics.ColorOliveDrab();
+  end;
+
+  function ColorOrange(): Color; overload;
+  begin
+    result := sgGraphics.ColorOrange();
+  end;
+
+  function ColorOrangeRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorOrangeRed();
+  end;
+
+  function ColorOrchid(): Color; overload;
+  begin
+    result := sgGraphics.ColorOrchid();
+  end;
+
+  function ColorPaleGoldenrod(): Color; overload;
+  begin
+    result := sgGraphics.ColorPaleGoldenrod();
+  end;
+
+  function ColorPaleGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorPaleGreen();
+  end;
+
+  function ColorPaleTurquoise(): Color; overload;
+  begin
+    result := sgGraphics.ColorPaleTurquoise();
+  end;
+
+  function ColorPaleVioletRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorPaleVioletRed();
+  end;
+
+  function ColorPapayaWhip(): Color; overload;
+  begin
+    result := sgGraphics.ColorPapayaWhip();
+  end;
+
+  function ColorPeachPuff(): Color; overload;
+  begin
+    result := sgGraphics.ColorPeachPuff();
+  end;
+
+  function ColorPeru(): Color; overload;
+  begin
+    result := sgGraphics.ColorPeru();
+  end;
+
+  function ColorPink(): Color; overload;
+  begin
+    result := sgGraphics.ColorPink();
+  end;
+
+  function ColorPlum(): Color; overload;
+  begin
+    result := sgGraphics.ColorPlum();
+  end;
+
+  function ColorPowderBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorPowderBlue();
+  end;
+
+  function ColorPurple(): Color; overload;
+  begin
+    result := sgGraphics.ColorPurple();
+  end;
+
+  function ColorRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorRed();
+  end;
+
+  function ColorRosyBrown(): Color; overload;
+  begin
+    result := sgGraphics.ColorRosyBrown();
+  end;
+
+  function ColorRoyalBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorRoyalBlue();
+  end;
+
+  function ColorSaddleBrown(): Color; overload;
+  begin
+    result := sgGraphics.ColorSaddleBrown();
+  end;
+
+  function ColorSalmon(): Color; overload;
+  begin
+    result := sgGraphics.ColorSalmon();
+  end;
+
+  function ColorSandyBrown(): Color; overload;
+  begin
+    result := sgGraphics.ColorSandyBrown();
+  end;
+
+  function ColorSeaGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorSeaGreen();
+  end;
+
+  function ColorSeaShell(): Color; overload;
+  begin
+    result := sgGraphics.ColorSeaShell();
+  end;
+
+  function ColorSienna(): Color; overload;
+  begin
+    result := sgGraphics.ColorSienna();
+  end;
+
+  function ColorSilver(): Color; overload;
+  begin
+    result := sgGraphics.ColorSilver();
+  end;
+
+  function ColorSkyBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorSkyBlue();
+  end;
+
+  function ColorSlateBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorSlateBlue();
+  end;
+
+  function ColorSlateGray(): Color; overload;
+  begin
+    result := sgGraphics.ColorSlateGray();
+  end;
+
+  function ColorSnow(): Color; overload;
+  begin
+    result := sgGraphics.ColorSnow();
+  end;
+
+  function ColorSpringGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorSpringGreen();
+  end;
+
+  function ColorSteelBlue(): Color; overload;
+  begin
+    result := sgGraphics.ColorSteelBlue();
+  end;
+
+  function ColorSwinburneRed(): Color; overload;
+  begin
+    result := sgGraphics.ColorSwinburneRed();
+  end;
+
+  function ColorTan(): Color; overload;
+  begin
+    result := sgGraphics.ColorTan();
+  end;
+
+  function ColorTeal(): Color; overload;
+  begin
+    result := sgGraphics.ColorTeal();
+  end;
+
+  function ColorThistle(): Color; overload;
+  begin
+    result := sgGraphics.ColorThistle();
+  end;
+
   function ColorToString(c: Color): String; overload;
   begin
     result := sgGraphics.ColorToString(c);
+  end;
+
+  function ColorTomato(): Color; overload;
+  begin
+    result := sgGraphics.ColorTomato();
+  end;
+
+  function ColorTransparent(): Color; overload;
+  begin
+    result := sgGraphics.ColorTransparent();
+  end;
+
+  function ColorTurquoise(): Color; overload;
+  begin
+    result := sgGraphics.ColorTurquoise();
+  end;
+
+  function ColorViolet(): Color; overload;
+  begin
+    result := sgGraphics.ColorViolet();
+  end;
+
+  function ColorWheat(): Color; overload;
+  begin
+    result := sgGraphics.ColorWheat();
+  end;
+
+  function ColorWhite(): Color; overload;
+  begin
+    result := sgGraphics.ColorWhite();
+  end;
+
+  function ColorWhiteSmoke(): Color; overload;
+  begin
+    result := sgGraphics.ColorWhiteSmoke();
+  end;
+
+  function ColorYellow(): Color; overload;
+  begin
+    result := sgGraphics.ColorYellow();
+  end;
+
+  function ColorYellowGreen(): Color; overload;
+  begin
+    result := sgGraphics.ColorYellowGreen();
   end;
 
   function CurrentClip(): Rectangle; overload;
@@ -6232,6 +7539,11 @@ implementation
   procedure DrawRectangleOnScreen(clr: Color; filled: Boolean; xPos: Longint; yPos: Longint; width: Longint; height: Longint); overload;
   begin
     sgGraphics.DrawRectangleOnScreen(clr,filled,xPos,yPos,width,height);
+  end;
+
+  procedure DrawThickLine(clr: Color; xPosStart: Single; yPosStart: Single; xPosEnd: Single; yPosEnd: Single; width: Single); overload;
+  begin
+    sgGraphics.DrawThickLine(clr,xPosStart,yPosStart,xPosEnd,yPosEnd,width);
   end;
 
   procedure DrawTriangle(clr: Color; x1: Single; y1: Single; x2: Single; y2: Single; x3: Single; y3: Single); overload;
@@ -7699,6 +9011,16 @@ implementation
     sgResources.SetAppPath(path,withExe);
   end;
 
+  procedure CallForAllSprites(fn: SpriteFunction); overload;
+  begin
+    sgSprites.CallForAllSprites(fn);
+  end;
+
+  procedure CallOnSpriteEvent(handler: SpriteEventHandler); overload;
+  begin
+    sgSprites.CallOnSpriteEvent(handler);
+  end;
+
   function CenterPoint(s: Sprite): Point2D; overload;
   begin
     result := sgSprites.CenterPoint(s);
@@ -7722,6 +9044,11 @@ implementation
   function CreateSprite(layer: Bitmap; pt: Point2D): Sprite; overload;
   begin
     result := sgSprites.CreateSprite(layer,pt);
+  end;
+
+  function CreateSprite(bitmapName: String; animationName: String): Sprite; overload;
+  begin
+    result := sgSprites.CreateSprite(bitmapName,animationName);
   end;
 
   function CreateSprite(name: String; layer: Bitmap): Sprite; overload;
@@ -7804,6 +9131,21 @@ implementation
     result := sgSprites.CreateSprite(name,layers,layerNames,ani);
   end;
 
+  procedure CreateSpritePack(name: String); overload;
+  begin
+    sgSprites.CreateSpritePack(name);
+  end;
+
+  function CurrentSpritePack(): String; overload;
+  begin
+    result := sgSprites.CurrentSpritePack();
+  end;
+
+  procedure DrawAllSprites(); overload;
+  begin
+    sgSprites.DrawAllSprites();
+  end;
+
   procedure DrawSprite(s: Sprite); overload;
   begin
     sgSprites.DrawSprite(s);
@@ -7827,6 +9169,11 @@ implementation
   function HasSprite(name: String): Boolean; overload;
   begin
     result := sgSprites.HasSprite(name);
+  end;
+
+  function HasSpritePack(name: String): Boolean; overload;
+  begin
+    result := sgSprites.HasSpritePack(name);
   end;
 
   procedure MoveSprite(s: Sprite); overload;
@@ -7864,6 +9211,11 @@ implementation
     sgSprites.ReleaseSprite(name);
   end;
 
+  procedure SelectSpritePack(name: String); overload;
+  begin
+    sgSprites.SelectSpritePack(name);
+  end;
+
   function SpriteAddLayer(s: Sprite; newLayer: Bitmap; layerName: String): Longint; overload;
   begin
     result := sgSprites.SpriteAddLayer(s,newLayer,layerName);
@@ -7889,6 +9241,11 @@ implementation
     result := sgSprites.SpriteAnimationHasEnded(s);
   end;
 
+  function SpriteAnimationName(s: Sprite): String; overload;
+  begin
+    result := sgSprites.SpriteAnimationName(s);
+  end;
+
   procedure SpriteBringLayerForward(s: Sprite; visibleLayer: Longint); overload;
   begin
     sgSprites.SpriteBringLayerForward(s,visibleLayer);
@@ -7897,6 +9254,11 @@ implementation
   procedure SpriteBringLayerToFront(s: Sprite; visibleLayer: Longint); overload;
   begin
     sgSprites.SpriteBringLayerToFront(s,visibleLayer);
+  end;
+
+  procedure SpriteCallOnEvent(s: Sprite; handler: SpriteEventHandler); overload;
+  begin
+    sgSprites.SpriteCallOnEvent(s,handler);
   end;
 
   function SpriteCircle(s: Sprite): Circle; overload;
@@ -8052,6 +9414,11 @@ implementation
   function SpriteMass(s: Sprite): Single; overload;
   begin
     result := sgSprites.SpriteMass(s);
+  end;
+
+  procedure SpriteMoveTo(s: Sprite; const pt: Point2D; takingSeconds: Longint); overload;
+  begin
+    sgSprites.SpriteMoveTo(s,pt,takingSeconds);
   end;
 
   function SpriteName(sprt: Sprite): String; overload;
@@ -8244,6 +9611,11 @@ implementation
     sgSprites.SpriteStartAnimation(s,idx,withSound);
   end;
 
+  procedure SpriteStopCallingOnEvent(s: Sprite; handler: SpriteEventHandler); overload;
+  begin
+    sgSprites.SpriteStopCallingOnEvent(s,handler);
+  end;
+
   procedure SpriteToggleLayerVisible(s: Sprite; id: Longint); overload;
   begin
     sgSprites.SpriteToggleLayerVisible(s,id);
@@ -8319,6 +9691,21 @@ implementation
     result := sgSprites.SpriteY(s);
   end;
 
+  procedure StopCallingOnSpriteEvent(handler: SpriteEventHandler); overload;
+  begin
+    sgSprites.StopCallingOnSpriteEvent(handler);
+  end;
+
+  procedure UpdateAllSprites(); overload;
+  begin
+    sgSprites.UpdateAllSprites();
+  end;
+
+  procedure UpdateAllSprites(pct: Single); overload;
+  begin
+    sgSprites.UpdateAllSprites(pct);
+  end;
+
   procedure UpdateSprite(s: Sprite); overload;
   begin
     sgSprites.UpdateSprite(s);
@@ -8344,14 +9731,14 @@ implementation
     sgSprites.UpdateSpriteAnimation(s);
   end;
 
-  procedure UpdateSpriteAnimation(s: Sprite; pct: Single); overload;
-  begin
-    sgSprites.UpdateSpriteAnimation(s,pct);
-  end;
-
   procedure UpdateSpriteAnimation(s: Sprite; withSound: Boolean); overload;
   begin
     sgSprites.UpdateSpriteAnimation(s,withSound);
+  end;
+
+  procedure UpdateSpriteAnimation(s: Sprite; pct: Single); overload;
+  begin
+    sgSprites.UpdateSpriteAnimation(s,pct);
   end;
 
   procedure UpdateSpriteAnimation(s: Sprite; pct: Single; withSound: Boolean); overload;
@@ -8684,6 +10071,11 @@ implementation
     sgTimers.PauseTimer(toPause);
   end;
 
+  procedure PauseTimer(name: String); overload;
+  begin
+    sgTimers.PauseTimer(name);
+  end;
+
   procedure ReleaseAllTimers(); overload;
   begin
     sgTimers.ReleaseAllTimers();
@@ -8694,14 +10086,29 @@ implementation
     sgTimers.ReleaseTimer(name);
   end;
 
+  procedure ResetTimer(name: String); overload;
+  begin
+    sgTimers.ResetTimer(name);
+  end;
+
   procedure ResetTimer(tmr: Timer); overload;
   begin
     sgTimers.ResetTimer(tmr);
   end;
 
+  procedure ResumeTimer(name: String); overload;
+  begin
+    sgTimers.ResumeTimer(name);
+  end;
+
   procedure ResumeTimer(toUnpause: Timer); overload;
   begin
     sgTimers.ResumeTimer(toUnpause);
+  end;
+
+  procedure StartTimer(name: String); overload;
+  begin
+    sgTimers.StartTimer(name);
   end;
 
   procedure StartTimer(toStart: Timer); overload;
@@ -8714,9 +10121,19 @@ implementation
     sgTimers.StopTimer(toStop);
   end;
 
+  procedure StopTimer(name: String); overload;
+  begin
+    sgTimers.StopTimer(name);
+  end;
+
   function TimerNamed(name: String): Timer; overload;
   begin
     result := sgTimers.TimerNamed(name);
+  end;
+
+  function TimerTicks(name: String): Longword; overload;
+  begin
+    result := sgTimers.TimerTicks(name);
   end;
 
   function TimerTicks(toGet: Timer): Longword; overload;
@@ -9837,6 +11254,81 @@ implementation
   procedure UpdateInterface(); overload;
   begin
     sgUserInterface.UpdateInterface();
+  end;
+
+  function ArduinoDeviceNamed(name: String): ArduinoDevice; overload;
+  begin
+    result := sgArduino.ArduinoDeviceNamed(name);
+  end;
+
+  function ArduinoHasData(dev: ArduinoDevice): Boolean; overload;
+  begin
+    result := sgArduino.ArduinoHasData(dev);
+  end;
+
+  function ArduinoReadByte(dev: ArduinoDevice): Byte; overload;
+  begin
+    result := sgArduino.ArduinoReadByte(dev);
+  end;
+
+  function ArduinoReadByte(dev: ArduinoDevice; timeout: Longint): Byte; overload;
+  begin
+    result := sgArduino.ArduinoReadByte(dev,timeout);
+  end;
+
+  function ArduinoReadLine(dev: ArduinoDevice): String; overload;
+  begin
+    result := sgArduino.ArduinoReadLine(dev);
+  end;
+
+  function ArduinoReadLine(dev: ArduinoDevice; timeout: Longint): String; overload;
+  begin
+    result := sgArduino.ArduinoReadLine(dev,timeout);
+  end;
+
+  procedure ArduinoSendByte(dev: ArduinoDevice; value: Byte); overload;
+  begin
+    sgArduino.ArduinoSendByte(dev,value);
+  end;
+
+  procedure ArduinoSendString(dev: ArduinoDevice; value: String); overload;
+  begin
+    sgArduino.ArduinoSendString(dev,value);
+  end;
+
+  procedure ArduinoSendStringLine(dev: ArduinoDevice; value: String); overload;
+  begin
+    sgArduino.ArduinoSendStringLine(dev,value);
+  end;
+
+  function CreateArduinoDevice(port: String; baud: Longint): ArduinoDevice; overload;
+  begin
+    result := sgArduino.CreateArduinoDevice(port,baud);
+  end;
+
+  function CreateArduinoDevice(name: String; port: String; baud: Longint): ArduinoDevice; overload;
+  begin
+    result := sgArduino.CreateArduinoDevice(name,port,baud);
+  end;
+
+  procedure FreeArduinoDevice(var dev: ArduinoDevice); overload;
+  begin
+    sgArduino.FreeArduinoDevice(dev);
+  end;
+
+  function HasArduinoDevice(name: String): Boolean; overload;
+  begin
+    result := sgArduino.HasArduinoDevice(name);
+  end;
+
+  procedure ReleaseAllArduinoDevices(); overload;
+  begin
+    sgArduino.ReleaseAllArduinoDevices();
+  end;
+
+  procedure ReleaseArduinoDevice(name: String); overload;
+  begin
+    sgArduino.ReleaseArduinoDevice(name);
   end;
 
 end.

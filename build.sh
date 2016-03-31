@@ -38,14 +38,40 @@ FULL_OUT_DIR="${FULL_APP_PATH}/bin"
 TMP_DIR="${APP_PATH}/tmp"
 SRC_DIR="${APP_PATH}/src"
 
-
-
 LOG_FILE="${APP_PATH}/out.log"
 
 PAS_FLAGS="-O3 -vw"
 SG_INC="-Fu${APP_PATH}/lib/"
 
 FPC_BIN=`which fpc`
+if [ -z "${FPC_BIN}" ]; then
+    echo
+    echo "I cannot find the Free Pascal Compiler."
+    echo "Please make sure you have installed it"
+    echo " - use the default location (no spaces in path)"
+    echo " - also restarted your computer after install"
+    echo
+    exit -1
+fi
+
+if [ "$OS" = "$MAC" ]; then
+#   Look for crt1.o
+    if [ ! -f /usr/lib/crt1.o ]; then
+        echo
+        echo "I cannot find the required libraries."
+        echo "Please try running the following command:"
+        echo "  xcode-select --install"
+        echo
+        exit -1
+    fi
+fi
+
+FPC_VER=`${FPC_BIN} -iV`
+
+FPC_MAJOR_VER=`echo ${FPC_VER} | awk -F'.' '{print $1}'`
+FPC_MINOR_VER=`echo ${FPC_VER} | awk -F'.' '{print $2}'`
+FPC_LESSR_VER=`echo ${FPC_VER} | awk -F'.' '{print $3}'`
+
 
 CLEAN="N"
 
@@ -162,6 +188,13 @@ DoExitCompile ()
 { 
     echo "An error occurred while compiling"; 
     cat out.log
+
+    if [ "$OS" = "$LIN" ]; then
+        echo ""
+        echo "Make sure you have the required libraries installed:"
+        echo "sudo apt-get install fpc curl libsdl1.2-dev libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsdl-net* libsmpeg*"
+    fi
+    
     exit 1; 
 }
 
@@ -203,8 +236,8 @@ doMacPackage()
     GAMEAPP_PATH="${FULL_OUT_DIR}/${GAME_NAME}.app"
     if [ -d "${GAMEAPP_PATH}" ] 
     then
-    	echo "  ... Removing old application"
-    	rm -rf "${GAMEAPP_PATH}"
+        echo "  ... Removing old application"
+        rm -rf "${GAMEAPP_PATH}"
     fi
 
     echo "  ... Creating Application Bundle"
@@ -256,7 +289,9 @@ doLinuxCompile()
     echo "  ... Compiling $GAME_MAIN"
     
     ${FPC_BIN}  ${PAS_FLAGS} ${SG_INC} -Mobjfpc -Sh -FE${OUT_DIR} -FU${TMP_DIR} -Fu${LIB_DIR} -Fi${SRC_DIR} -o"${GAME_NAME}" ${SRC_DIR}/${GAME_MAIN} > ${LOG_FILE}
-    if [ $? != 0 ]; then DoExitCompile; fi
+    if [ $? != 0 ]; then 
+        DoExitCompile; 
+    fi
 }
 
 doLinuxPackage()
@@ -380,17 +415,26 @@ then
     if [ "$OS" = "$MAC" ]; then
         HAS_LION=false
         OS_VER=`sw_vers -productVersion | awk -F . '{print $1"."$2}'`
+        OS_VER_MINOR=`sw_vers -productVersion | awk -F . '{print $2}'`
         
-        if [ $OS_VER = '10.7' ]; then
-            HAS_LION=true
-        fi
-        if [ $OS_VER = '10.8' ]; then
+        if [ $OS_VER_MINOR -ge "7" ]; then
+            # Is Lion or later = has PIE
             HAS_LION=true
         fi
         
         if [ $HAS_LION = true ]; then
-            PAS_FLAGS="$PAS_FLAGS -k-macosx_version_min -k10.7 -k-no_pie"
+            if (( ($FPC_MAJOR_VER == 2) && ($FPC_MINOR_VER == 6) && (FPC_LESSR_VER == 0) )); then
+                PAS_FLAGS="$PAS_FLAGS -k-macosx_version_min -k${OS_VER} -k-no_pie"
+            else
+                PAS_FLAGS="$PAS_FLAGS -WM10.7"
+            fi
+        else
+            PAS_FLAGS="${PAS_FLAGS} -dNO_ARC"
+            if (( ($FPC_MAJOR_VER == 2) && ($FPC_MINOR_VER == 6) && (FPC_LESSR_VER > 0) )); then
+                PAS_FLAGS="$PAS_FLAGS -WM10.5"
+            fi
         fi
+        
         doBasicMacCompile
         doMacPackage
     elif [ "$OS" = "$LIN" ]; then

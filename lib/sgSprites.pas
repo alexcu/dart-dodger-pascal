@@ -7,6 +7,11 @@
 // Change History:
 //
 // Version 3.0:
+// - 2013-11-13: Andrew : Add Sprite Packs
+// - 2013-11-12: Andrew : Updated Sprite constructors
+// - 2013-11-08: Andrew : Add Sprite Event Details
+//
+// ... long missing history --sadface--
 // - 2010-12-31: Andrew : Added name to sprite
 //                      : Added standard resource management code
 // - 2009-12-21: Andrew : Added the ability to toggle visible layers.
@@ -55,6 +60,16 @@ interface
   /// @constructor
   /// @csn initWithBitmap:%s
   function CreateSprite(layer: Bitmap): Sprite; overload;
+
+  /// Creates a sprite. The bitmapName is used to indicate the bitmap the sprite will use, and the 
+  /// animationName is used to indicate which AnimationScript to use.
+  ///
+  /// @lib CreateSpriteWithBitmapAndAnimationName
+  /// 
+  /// @class Sprite
+  /// @constructor
+  /// @csn initWithBitmapNamed:%s animationScriptNamed:%s
+  function CreateSprite(bitmapName, animationName: String): Sprite; overload;
   
   /// Creates a sprite for the passed in bitmap image. The sprite will use the cell information within the 
   /// sprite if it is animated at a later stage. This version of CreateSprite will initialise the sprite to use
@@ -113,7 +128,7 @@ interface
   /// @constructor
   /// @csn initWithBitmap:%s animationScript:%s
   function CreateSprite(layer: Bitmap; ani: AnimationScript): Sprite; overload;
-  
+
   /// Creates a sprite for the passed in bitmap image. The sprite will use the cell information within the 
   /// sprite if it is animated at a later stage. This version of CreateSprite will initialise the sprite to use
   /// pixel level collisions, the specified animation template, the layer have name 'layer1', at the given
@@ -225,7 +240,7 @@ interface
   /// @constructor
   /// @csn initNamed:%s withBitmap:%s
   function CreateSprite(name: String; layer: Bitmap): Sprite; overload;
-  
+
   /// Creates a sprite for the passed in bitmap image. The sprite will use the cell information within the 
   /// sprite if it is animated at a later stage. This version of CreateSprite will initialise the sprite to use
   /// pixel level collisions, no animation, and the specified layer have name.
@@ -347,7 +362,43 @@ interface
   /// @lib
   procedure ReleaseAllSprites();
   
+//---------------------------------------------------------------------------
+// Event Code
+//---------------------------------------------------------------------------
+
+  /// Register a procedure to be called when an events occur on any sprite.
+  ///
+  /// @lib
+  /// @sn callOnSpriteEvent:%s
+  procedure CallOnSpriteEvent(handler: SpriteEventHandler);
   
+  /// Removes an global event handler, stopping events calling the indicated procedure.
+  ///
+  /// @lib
+  /// @sn stopCallingOnSpriteEvent:%s
+  procedure StopCallingOnSpriteEvent(handler: SpriteEventHandler);
+
+  /// Register a procedure to call when events occur on the sprite.
+  ///
+  /// @lib
+  /// @sn sprite:%s callOnEvent:%s
+  ///
+  /// @class Sprite
+  /// @method CallOnEvent
+  /// @csn callOnEvent:%s
+  procedure SpriteCallOnEvent(s: Sprite; handler: SpriteEventHandler);
+
+  /// Removes an event handler from the sprite, stopping events from this 
+  /// Sprite calling the indicated method.
+  ///
+  /// @lib
+  /// @sn sprite:%s stopCallingOnEvent:%s
+  ///
+  /// @class Sprite
+  /// @method StopCallingOnEvent
+  /// @csn stopCallingOnEvent:%s
+  procedure SpriteStopCallingOnEvent(s: Sprite; handler: SpriteEventHandler);
+
   
 //---------------------------------------------------------------------------
 // Layer code
@@ -756,6 +807,21 @@ interface
   /// @csn startAnimation:%s withSound:%s
   procedure SpriteStartAnimation(s: Sprite; idx: Longint; withSound: Boolean); overload;
   
+  /// Returns the name of the Sprite's current animation.
+  /// 
+  /// @lib SpriteAnimationName
+  /// @sn spriteAnimationName:%s
+  /// 
+  /// @class Sprite
+  /// @method animationName
+  function SpriteAnimationName(s: Sprite): String;
+
+
+
+//---------------------------------------------------------------------------
+// Sprite Update code
+//---------------------------------------------------------------------------
+    
   /// Update the position and animation details of the Sprite.
   /// This will play a sound effect if the new cell of the animation
   /// has a sound.
@@ -901,6 +967,19 @@ interface
 // Drawing code
 //---------------------------------------------------------------------------
   
+  /// Draws the sprite at its location in the world. This is effected by the
+  /// position of the camera and the sprites current location.
+  ///
+  /// This is the standard routine for drawing sprites to the screen and should be
+  /// used in most cases.
+  ///
+  /// @lib DrawSpriteOffsetXY(s, 0, 0)
+  /// @uname DrawSprite
+  /// 
+  /// @class Sprite
+  /// @method Draw
+  procedure DrawSprite(s : Sprite); overload;
+
   /// Draws the sprite at its position in the game offset by a given amount. Only
   /// use this method when you want to draw the sprite displaced from its location
   /// in your game. Otherwise you should change the sprite's location and then
@@ -925,21 +1004,7 @@ interface
   /// @class Sprite
   /// @overload Draw DrawOffsetPoint
   /// @csn drawOffset:%s
-  procedure DrawSprite(s : Sprite; const position: Point2D); overload;
-  
-  /// Draws the sprite at its location in the world. This is effected by the
-  /// position of the camera and the sprites current location.
-  ///
-  /// This is the standard routine for drawing sprites to the screen and should be
-  /// used in most cases.
-  ///
-  /// @lib DrawSpriteOffsetXY(s, 0, 0)
-  /// @uname DrawSprite
-  /// 
-  /// @class Sprite
-  /// @method Draw
-  procedure DrawSprite(s : Sprite); overload;
-  
+  procedure DrawSprite(s : Sprite; const position: Point2D); overload;  
   
   
 //---------------------------------------------------------------------------
@@ -1006,7 +1071,19 @@ interface
   /// @method MoveTo
   /// @csn moveToX:%s y:%s
   procedure MoveSpriteTo(s : Sprite; x,y : Longint);
-  
+
+
+  /// This procedure starts the sprite moving to the indicated
+  /// destination point, over a specified number of seconds. When the 
+  /// sprite arrives it will raise the SpriteArrived event.
+  ///
+  /// @lib
+  /// @sn sprite:%s moveTo:%s takingSeconds:%s
+  ///
+  /// @class Sprite
+  /// @overload MoveTo MoveToTakingSeconds
+  /// @csn moveTo:%s takingSeconds:%s
+  procedure SpriteMoveTo(s: Sprite; const pt: Point2D; takingSeconds: Longint);
   
   
 //---------------------------------------------------------------------------
@@ -1546,6 +1623,57 @@ interface
   /// @getter Name
   function SpriteName(sprt: Sprite): String;
   
+
+//---------------------------------------------------------------------------
+// Sprite Packs
+//---------------------------------------------------------------------------
+
+  /// Draws all of the sprites in the current Sprite pack. Packs can be
+  /// switched to select between different sets of sprites.
+  ///
+  /// @lib 
+  procedure DrawAllSprites();
+
+  /// Update all of the sprites in the current Sprite pack. 
+  ///
+  /// @lib
+  procedure UpdateAllSprites(); overload;
+
+  /// Update all of the sprites in the current Sprite pack, passing in a
+  /// percentage value to indicate the percentage to update.
+  ///
+  /// @lib UpdateAllSpritesPct
+  procedure UpdateAllSprites(pct: Single); overload;
+
+  /// Call the supplied function for all sprites.
+  ///
+  /// @lib
+  procedure CallForAllSprites(fn: SpriteFunction);
+
+  /// Create a new SpritePack with a given name. This pack can then be 
+  /// selected and used to control which sprites are drawn/updated in
+  /// the calls to DrawAllSprites and UpdateAllSprites.
+  ///
+  /// @lib
+  procedure CreateSpritePack(name: String);
+
+  /// Indicates if a given SpritePack has already been created.
+  ///
+  /// @lib
+  function HasSpritePack(name: String): Boolean;
+
+  /// Selects the named SpritePack (if it has been created). The
+  /// selected SpritePack determines which sprites are drawn and updated
+  /// with the DrawAllSprites and UpdateAllSprites code.
+  ///
+  /// @lib
+  procedure SelectSpritePack(name: String);
+
+  /// Returns the name of the currently selected SpritePack.
+  ///
+  /// @lib
+  function CurrentSpritePack(): String;
+
   
   
 //=============================================================================
@@ -1553,12 +1681,16 @@ implementation
   uses
     Classes, SysUtils, Math, // System
     stringhash,
-    sgNamedIndexCollection, //libsrc
-    sgAnimations, sgGraphics, sgGeometry, sgCamera, sgShared, sgResources, sgImages, sgTrace; //SwinGame
+    sgNamedIndexCollection, SpritePack, //libsrc
+    sgAnimations, sgGraphics, sgGeometry, sgPhysics, sgInput, sgCamera, sgShared, sgResources, sgImages, sgTrace, sgTimers; //SwinGame
 //=============================================================================
 
   var
+    _GlobalSpriteEventHandlers: array of SpriteEventHandler;
     _Sprites: TStringHash;
+    _SpritePacks: TStringHash;
+    _spriteTimer: Timer;
+    _CurrentPack: TSpritePack;
   
   const
     MASS_IDX      = 0;  // The index of the sprite's mass value
@@ -1566,8 +1698,40 @@ implementation
     SCALE_IDX     = 2;  // The index of the sprite's scale value
     // WIDTH_IDX     = 3;  // The index of the sprite's width value
     // HEIGHT_IDX    = 4;  // The index of the sprite's height value
-    
+
+
+
+  //-----------------------------------------------------------------------------
+  // Event Utility Code
+  //-----------------------------------------------------------------------------
   
+  //
+  // Loop through all event listeners and notify them of the event
+  //
+  procedure SpriteRaiseEvent(s: Sprite; evt: SpriteEventKind);
+  var
+    i: Integer;
+  begin
+    if not Assigned(s) then exit;
+
+    // this sprite's event handlers
+    for i := 0 to High(s^.evts) do
+    begin
+      SpriteEventHandler(s^.evts[i])(s, evt);
+    end;
+
+    // global sprite event handlers
+    for i := 0 to High(_GlobalSpriteEventHandlers) do
+    begin
+      SpriteEventHandler(_GlobalSpriteEventHandlers[i])(s, evt);
+    end;
+  end;
+  
+
+  //-----------------------------------------------------------------------------
+  // ...
+  //-----------------------------------------------------------------------------
+
   function VectorFromTo(s1, s2: Sprite): Vector;
   begin
     result := VectorFromPoints(CenterPoint(s1), CenterPoint(s2));
@@ -1604,6 +1768,11 @@ implementation
   function CreateSprite(layer: Bitmap; ani: AnimationScript): Sprite; overload;
   begin
     result := CreateSprite(layer, 'layer0', ani);
+  end;
+
+  function CreateSprite(bitmapName, animationName: String): Sprite; overload;
+  begin
+    result := CreateSprite(BitmapNamed(bitmapName), AnimationScriptNamed(animationName));
   end;
   
   function CreateSprite(layer: Bitmap; ani: AnimationScript; x, y: Single): Sprite; overload;
@@ -1803,15 +1972,28 @@ implementation
     // Setup cache details
     result^.backupCollisionBitmap   := nil;
     result^.cacheImage              := nil;
-    
+
+    // Event details
+    result^.announcedAnimationEnd := false;
+    result^.isMoving := false;
+    result^.destination := PointAt(0,0);
+    result^.movingVec := VectorTo(0,0);
+    result^.arriveInSec := 0;
+    result^.lastUpdate := TimerTicks(_spriteTimer);
+    SetLength(result^.evts, 0);
+
+    // Register in _Sprites
     obj := tResourceContainer.Create(result);
     // WriteLn('Adding for ', name, ' ', HexStr(obj));
     if not _Sprites.setValue(name, obj) then
     begin
-        RaiseException('** Leaking: Caused by loading Sprite created twice, ' + name);
+        RaiseWarning('** Leaking: Caused by loading Sprite created twice, ' + name);
         result := nil;
         exit;
     end;
+
+    result^.pack := _CurrentPack;
+    _CurrentPack.AddSprite(result);
   end;
   
   function HasSprite(name: String): Boolean;
@@ -1950,6 +2132,8 @@ implementation
       s^.collisionBitmap := nil;
       s^.backupCollisionBitmap := nil;
       
+      TSpritePack(s^.pack).RemoveSprite(s);
+      
       // Remove from hashtable
       // WriteLn('Freeing Sprite named: ', s^.name);
       _Sprites.remove(s^.name).Free();
@@ -1992,6 +2176,7 @@ implementation
     if s = nil then exit;
     
     RestartAnimation(s^.animationInfo, withSound);
+    if not SpriteAnimationHasEnded(s) then s^.announcedAnimationEnd := false;
   end;
   
   procedure SpriteStartAnimation(s: Sprite; named: String);
@@ -2025,17 +2210,25 @@ implementation
   begin
     if not Assigned(s) then exit;
     if not Assigned(s^.animationScript) then exit;
-	if (idx < 0) or (idx > High(s^.animationScript^.animations)) then
+    if (idx < 0) or (idx > High(s^.animationScript^.animations)) then
     begin
-		RaiseWarning('Unable to create animation no. ' + IntToStr(idx) + ' for sprite ' + s^.name + ' from script ' + s^.animationScript^.name);
-		exit;
-	end;
+		  RaiseWarning('Unable to create animation no. ' + IntToStr(idx) + ' for sprite ' + s^.name + ' from script ' + s^.animationScript^.name);
+		  exit;
+    end;
     
     if Assigned(s^.animationInfo) then
       AssignAnimation(s^.animationInfo, idx, s^.animationScript, withSound)
     else
       s^.animationInfo := CreateAnimation(idx, s^.animationScript, withSound);
+
+    if not SpriteAnimationHasEnded(s) then s^.announcedAnimationEnd := false;
     // WriteLn('Sprite Animation: ', HexStr(s^.animationInfo));
+  end;
+
+  function SpriteAnimationName(s: Sprite): String;
+  begin
+    if Assigned(s) then result := AnimationName(s^.animationInfo)
+    else result := '';
   end;
   
   procedure UpdateSpriteAnimation(s: Sprite); overload;
@@ -2079,8 +2272,29 @@ implementation
   
   procedure UpdateSprite(s: Sprite; pct: Single; withSound: Boolean); overload;
   begin
-    MoveSprite(s, pct);
-    UpdateSpriteAnimation(s, pct, withSound);
+    if assigned(s) then
+    begin
+      MoveSprite(s, pct);
+      UpdateSpriteAnimation(s, pct, withSound);
+
+      {$IFDEF IOS}
+        if MouseClicked(LeftButton) and CircleCircleCollision(SpriteCollisionCircle(s), CircleAt(MouseX(), MouseY(), 17)) then
+        begin
+          SpriteRaiseEvent(s, SpriteTouchedEvent);
+        end;
+      {$ELSE}
+        if MouseClicked(LeftButton) and CircleCircleCollision(SpriteCollisionCircle(s), CircleAt(MouseX(), MouseY(), 1)) then
+        begin
+          SpriteRaiseEvent(s, SpriteClickedEvent);  
+        end;
+      {$ENDIF}
+
+      if SpriteAnimationHasEnded(s) and (not s^.announcedAnimationEnd) then
+      begin
+        s^.announcedAnimationEnd := true;
+        SpriteRaiseEvent(s, SpriteAnimationEndedEvent);
+      end;
+    end;
   end;
   
   procedure DrawSprite(s: Sprite); overload;
@@ -2134,7 +2348,7 @@ implementation
     mvmt: Vector;
     trans: Matrix2D;
   begin
-    if not Assigned(s) then begin RaiseException('No sprite supplied'); exit; end;
+    if not Assigned(s) then begin RaiseWarning('No sprite supplied to MoveSprite'); exit; end;
     
     if SpriteRotation(s) <> 0 then
     begin
@@ -2146,6 +2360,26 @@ implementation
        
     s^.position.x := s^.position.x + (pct * mvmt.x);
     s^.position.y := s^.position.y + (pct * mvmt.y);
+
+    if s^.isMoving then
+    begin
+      pct := (TimerTicks(_spriteTimer) - s^.lastUpdate) / 1000;
+      if pct <= 0 then exit;
+
+      s^.lastUpdate := TimerTicks(_spriteTimer);
+
+      s^.position.x += pct * s^.movingVec.x;
+      s^.position.y += pct * s^.movingVec.y;
+
+      s^.arriveInSec -= pct;
+      if s^.arriveInSec <= 0 then 
+      begin
+        s^.isMoving := false;
+        s^.arriveInSec := 0;
+
+        SpriteRaiseEvent(s, SpriteArrivedEvent);
+      end;
+    end;
   end;
 
   procedure MoveSpriteTo(s : Sprite; x,y : Longint);
@@ -2559,7 +2793,7 @@ implementation
     {$ENDIF}
   end;
   
-  function SpriteCollisionRectangle(s: Sprite): Rectangle; overload;
+  function SpriteCollisionRectangle(s: Sprite): Rectangle;
   begin
     {$IFDEF TRACE}
       TraceEnter('sgSprites', 'SpriteCollisionRectangle(s: Sprite): Rectangle', '');
@@ -2920,6 +3154,156 @@ implementation
     result := sprt^.name;
   end;
 
+  procedure SpriteMoveTo(s: Sprite; const pt: Point2D; takingSeconds: Longint);
+  begin
+    if not assigned(s) then exit;
+
+    s^.destination := pt;
+    s^.arriveInSec := takingSeconds;
+    s^.isMoving := true;
+    s^.movingVec := VectorMultiply(UnitVector(VectorFromPoints(CenterPoint(s), pt)), PointPointDistance(CenterPoint(s), pt) / takingSeconds);
+    s^.lastUpdate := TimerTicks(_spriteTimer);
+  end;
+
+//---------------------------------------------------------------------------
+// Event Code
+//---------------------------------------------------------------------------
+
+  procedure _AddSpriteEventHandler(var arr: SpriteEventHandlerArray; handler: SpriteEventHandler);
+  begin
+    if Assigned(handler) then
+    begin
+      SetLength(arr, Length(arr) + 1);
+      arr[High(arr)] := handler;
+    end;
+  end;
+
+  function _IndexOfSpriteEventHandler(const arr: SpriteEventHandlerArray; handler: SpriteEventHandler): Integer;
+  var
+    i: Integer;
+  begin
+    for i := 0 to High(arr) do
+    begin
+      if arr[i] = handler then
+      begin
+        result := i;
+        exit;
+      end;
+    end;
+    result := -1;
+  end;
+
+  procedure _RemoveSpriteEventHandler(var arr: SpriteEventHandlerArray; handler: SpriteEventHandler);
+  var
+    i, idx: Integer;
+  begin
+    idx := _IndexOfSpriteEventHandler(arr, handler);
+    
+    if idx < 0 then exit;
+    
+    for i := idx to High(arr) - 1 do
+    begin
+      arr[i] := arr[i + 1];
+    end;
+
+    SetLength(arr, Length(arr) - 1);
+  end;
+
+  procedure CallOnSpriteEvent(handler: SpriteEventHandler);
+  begin
+    _AddSpriteEventHandler(_GlobalSpriteEventHandlers, handler);
+  end;
+  
+  procedure StopCallingOnSpriteEvent(handler: SpriteEventHandler);
+  begin
+    _RemoveSpriteEventHandler(_GlobalSpriteEventHandlers, handler);
+  end;
+
+  procedure SpriteCallOnEvent(s: Sprite; handler: SpriteEventHandler);
+  begin
+    if Assigned(s) then
+    begin
+      _AddSpriteEventHandler(s^.evts, handler);
+    end;
+  end;
+
+  procedure SpriteStopCallingOnEvent(s: Sprite; handler: SpriteEventHandler);
+  begin
+    if Assigned(s) then
+    begin
+      _RemoveSpriteEventHandler(s^.evts, handler);
+    end;
+  end;
+
+//---------------------------------------------------------------------------
+// Sprite Packs
+//---------------------------------------------------------------------------
+
+  // Duplicate for the UpdateSprite for use in UpdateAllSprites... as it
+  // currently does not select the correct overload.
+  procedure _UpdateSpritePct(s: Sprite; pct: Single);
+  begin
+    UpdateSprite(s, pct);  
+  end;
+
+  procedure DrawAllSprites();
+  begin
+    _CurrentPack.CallForAllSprites(@DrawSprite);
+  end;
+
+  procedure UpdateAllSprites(pct: Single); overload;
+  begin
+    _CurrentPack.CallForAllSprites(@_UpdateSpritePct, pct);
+  end;
+
+  procedure CallForAllSprites(fn: SpriteFunction);
+  begin
+    _CurrentPack.CallForAllSprites(fn);
+  end;
+
+  procedure UpdateAllSprites(); overload;
+  begin
+    UpdateAllSprites(1.0);
+  end;
+
+  procedure CreateSpritePack(name: String);
+  begin
+    if not HasSpritePack(name) then
+    begin
+      _CurrentPack := TSpritePack.Create(name);
+      _CurrentPack.AddPackTo(_SpritePacks);
+    end
+    else
+    begin
+      RaiseWarning('The SpritePack ' + name + ' already exists');
+    end;
+  end;
+
+  function HasSpritePack(name: String): Boolean;
+  begin
+    result := _SpritePacks.ContainsKey(name);
+  end;
+
+  function CurrentSpritePack(): String;
+  begin
+    result := _CurrentPack.Name;
+  end;
+
+  procedure SelectSpritePack(name: String);
+  begin
+    if HasSpritePack(name) then
+    begin
+      _CurrentPack := TSpritePack(_SpritePacks.Values[name]);
+    end
+    else
+    begin
+      RaiseWarning('No SpritePack named ' + name + ' to select.');
+    end;
+  end;
+
+
+
+
 
 //=============================================================================
 
@@ -2928,7 +3312,18 @@ implementation
     InitialiseSwinGame();
     
     _Sprites := TStringHash.Create(False, 16384);
-  end;
+    _SpritePacks := TStringHash.Create(False, 50);
+
+    _CurrentPack := TSpritePack.Create('Default');
+    _CurrentPack.AddPackTo(_SpritePacks);
+
+    // Sprite movement timer - all sprites movement is timed from this
+    _spriteTimer := CreateTimer('*SG* SpriteTimer');
+    StartTimer(_spriteTimer);
+
+    // Sprite Event Handlers
+    SetLength(_GlobalSpriteEventHandlers, 0);
+end;
   
   finalization
   begin

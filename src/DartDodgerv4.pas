@@ -17,6 +17,7 @@ const
 	BALLOON_YPOS = 400;
 	MAX_DARTS = 30 - 1;
 	BALLOON_YPOS_ADD = 20;
+  HIGH_SCORE_NAME = 'ddhs.txt';
 
 type
 	Direction = (left, right);
@@ -80,15 +81,15 @@ end;
 //-----------------------------------------------------------------------------
 
 procedure NewHighScoreFile(corrupted : Boolean);
-var 
+var
 	HighScoreFile : Text;
 begin
 	// Check if HS file doesn't exist
-	if (not FileExists('ddhs.txt')) or (corrupted) then
+	if (not FileExists(FilenameToResource(HIGH_SCORE_NAME, BundleResource))) or (corrupted) then
 	begin
 		// Make a file
-		FileCreate('ddhs.txt');
-		Assign(HighScoreFile, 'ddhs.txt');
+		FileCreate(FilenameToResource(HIGH_SCORE_NAME, BundleResource));
+		Assign(HighScoreFile, FilenameToResource(HIGH_SCORE_NAME, BundleResource));
 		Rewrite(HighScoreFile);
 		// Add a zero score
 		Write(HighScoreFile, '0');
@@ -103,7 +104,7 @@ end;
 //-----------------------------------------------------------------------------
 
 function ReadHighScore(): Integer ;
-var 
+var
 	HighScoreFile : Text;
 	HighScoreStr : String;
 begin
@@ -111,7 +112,7 @@ begin
 	NewHighScoreFile(false);
 
 	// Open the HS File for reading
-	Assign(HighScoreFile, 'ddhs.txt');
+	Assign(HighScoreFile, FilenameToResource(HIGH_SCORE_NAME, BundleResource));
 	Reset(HighScoreFile);
 
 	// Read previous HS and close
@@ -122,7 +123,7 @@ begin
 	if (not TryStrToInt(HighScoreStr, result)) then
 	begin
 		// Delete corrupted HS file
-		DeleteFile('ddhs.txt');
+		DeleteFile(FilenameToResource(HIGH_SCORE_NAME, BundleResource));
 		// Create a new high score file
 		NewHighScoreFile(true);
 	end
@@ -141,14 +142,14 @@ end;
 //-----------------------------------------------------------------------------
 
 procedure WriteHighScore(const playerScore: Integer);
-var 
+var
 	HighScoreFile : Text;
 begin
 	// Create a new high score file if non-existant
 	NewHighScoreFile(false);
 
 	// Check if current score beats high score
-	Assign(HighScoreFile, 'ddhs.txt');
+	Assign(HighScoreFile, FilenameToResource(HIGH_SCORE_NAME, BundleResource));
 	Rewrite(HighScoreFile);
 	// Add the new high score
 	Write(HighScoreFile, IntToStr(playerScore));
@@ -173,7 +174,7 @@ begin
 	LoadBitmapNamed('cloud', 'cloud.png');
 	LoadBitmapNamed('health', 'health.png');
 	LoadBitmapNamed('icon', 'icon.png');
-	
+
 	//Load Music/Sound
 	LoadMusicNamed('song', 'mainsong2.ogg');
 	LoadSoundEffectNamed('menu', 'menu.ogg');
@@ -199,11 +200,11 @@ end;
 //============================================================================
 
 procedure Initialise(	var balloon : BalloonData;
-						var darts : array of DartData; 
+						var darts : array of DartData;
 						var cloud : CloudData;
 						var health : HealthData;
 						var ctrl : ControlData);
-var 
+var
 	i : Integer;
 begin
 	// A new, initialised game has a colour of Blue
@@ -244,9 +245,9 @@ begin
 							BitmapHeight(BitmapNamed('background'));
 	ctrl.menu := true;
 	ctrl.resetGame := false;
-	ctrl.scoreTimer := CreateTimer(); 
+	ctrl.scoreTimer := CreateTimer();
 	StartTimer(ctrl.scoreTimer);
-	ctrl.chanceTimer := CreateTimer(); 
+	ctrl.chanceTimer := CreateTimer();
 	StartTimer(ctrl.chanceTimer);
 end;
 
@@ -319,16 +320,16 @@ begin
 		if xPos < -BitmapWidth(BitmapNamed('balloon')) then
 		begin
 			// Return back to right.
-			xPos := ScreenWidth() - BitmapWidth(BitmapNamed('balloon')); 
+			xPos := ScreenWidth() - BitmapWidth(BitmapNamed('balloon'));
 			status := offRight
 		end;
 	end
 	// Else balloon off screen (right)?
-	else if xPos + BitmapWidth(BitmapNamed('balloon')) > ScreenWidth() then 
-	begin	
+	else if xPos + BitmapWidth(BitmapNamed('balloon')) > ScreenWidth() then
+	begin
 		status := offRight;
 		// Fully past rightmost outer-screen limits?å
-		if xPos > ScreenWidth() then 
+		if xPos > ScreenWidth() then
 		begin
 			xPos := 0; // Return back to left.
 			status := offLeft;
@@ -354,21 +355,21 @@ begin
 		begin
 			darts[i].yPos += speed; // Move darts down
 			// Dart is now on screen?
-			if darts[i].yPos + BitmapHeight(BitmapNamed('dart')) > 0 then 
+			if darts[i].yPos + BitmapHeight(BitmapNamed('dart')) > 0 then
 				darts[i].onScreen := true;
 			// The i'th dart is off the screen?
-			if darts[i].yPos > ScreenHeight() then 
+			if darts[i].yPos > ScreenHeight() then
 				LoopDart(darts[i]); // Loop i'th dart back up top.
 		end
 		// Else the i'th dart does exceed dart limit and still on screen?
-		else if not darts[i].onScreen then 
+		else if not darts[i].onScreen then
 			LoopDart(darts[i]); // Loop i'th dart back up top.
 	end;
 end;
 
 //-----------------------------------------------------------------------------
 // MoveCloud
-// DESCRIPTION: Procedure moves a cloud left or right and checks if off 
+// DESCRIPTION: Procedure moves a cloud left or right and checks if off
 //				screen
 //-----------------------------------------------------------------------------
 
@@ -385,7 +386,7 @@ begin
 				cloud.onScreen := false;
 				cloud.xPos := ScreenWidth(); // Keep it off screen
 			end;
-		end 
+		end
 		else if cloud.dir = left then // Cloud is currently moving right?
 		begin
 			cloud.xPos -= Round(speed/2);
@@ -451,8 +452,8 @@ begin
 	begin
 		// If player had achieved high score?
 		if ctrl.playerScore = ctrl.highScore then
-			WriteHighScore(ctrl.playerScore); // Write a high score to file	
-		StartTimer(health.dyingTimer);				
+			WriteHighScore(ctrl.playerScore); // Write a high score to file
+		StartTimer(health.dyingTimer);
 		ctrl.gameSpeed := -4; // Start to fall to death
 		SpawnHealth(health, balloon);
 	end;
@@ -468,7 +469,7 @@ end;
 function BalloonCollideWith(	balloon : BalloonData;
 								collisionLine : LineSegment;
 								collisionType : String):Boolean ;
-const 
+const
 	BALLOONTRI_INNERSCALE = 17;
 var
 	balloonTri : array [0..1] of Triangle;
@@ -479,7 +480,7 @@ begin
 	// 		-    The index 0 refers to a normal balloon state(not off edge)
 	// 		-    The index 1 refers to a right balloon state (off left edge)
 	// 		- OR the index 1 refers to a left balloon state  (off right edge)
-	
+
 	// Populates null triangles so that it won't interfere later on
 	balloonTri[0] := CreateTriangle(-1000,-1000,-1000,-1000,-1000,-1000);
 	balloonTri[1] := CreateTriangle(-1000,-1000,-1000,-1000,-1000,-1000);
@@ -503,20 +504,20 @@ begin
 	    	balloonTri[i] := CreateTriangle({X1}balloon.xPos,
 	    									{Y1}BALLOON_YPOS+BitmapHeight(BitmapNamed('balloon'))/2,
 											{X2}balloon.xPos+BitmapWidth(BitmapNamed('balloon'))/2,
-											{Y2}BALLOON_YPOS, 
+											{Y2}BALLOON_YPOS,
 											{X3}balloon.xPos+BitmapWidth(BitmapNamed('balloon')),
 											{Y3}BALLOON_YPOS+BitmapHeight(BitmapNamed('balloon'))/2)
 	    else if collisionType = 'inner' then
 		    // Create Inner Triangle to test against
 			balloonTri[i] := CreateTriangle({X1}balloon.xPos+BALLOONTRI_INNERSCALE,
-											{Y1}BALLOON_YPOS+BitmapHeight(BitmapNamed('balloon'))/2, 
+											{Y1}BALLOON_YPOS+BitmapHeight(BitmapNamed('balloon'))/2,
 											{X2}balloon.xPos+BitmapWidth(BitmapNamed('balloon'))/2,
 											{Y2}BALLOON_YPOS+BALLOONTRI_INNERSCALE * 1.7,
 											{X3}balloon.xPos+BitmapWidth(BitmapNamed('balloon'))-BALLOONTRI_INNERSCALE,
 											{Y3}BALLOON_YPOS+BitmapHeight(BitmapNamed('balloon'))/2);
-		
+
 		// Result will be if EITHER (or) triangle has collided with collision line
-		result := 	(TriangleLineCollision(balloonTri[0], collisionLine)) 
+		result := 	(TriangleLineCollision(balloonTri[0], collisionLine))
 					or (TriangleLineCollision(balloonTri[1], collisionLine));
 
 		// { DEBUG ONLY }
@@ -578,7 +579,7 @@ end;
 
 //-----------------------------------------------------------------------------
 // BalloonCollideCloud
-// DESCRIPTION: Check balloon collisions with cloud; 
+// DESCRIPTION: Check balloon collisions with cloud;
 //				Force the balloon in cloud dir if collided
 //-----------------------------------------------------------------------------
 
@@ -624,7 +625,7 @@ end;
 
 //-----------------------------------------------------------------------------
 // BalloonCollideHealth
-// DESCRIPTION: Check balloon collisions with health; 
+// DESCRIPTION: Check balloon collisions with health;
 //				increase a life on collision
 //-----------------------------------------------------------------------------
 
@@ -670,7 +671,7 @@ begin
 	begin
 		// Moving right
 		cloud.dir := right;
-		// Put it on left (to move right). 
+		// Put it on left (to move right).
 		cloud.xPos := -BitmapWidth(BitmapNamed('cloud'));
 	end
 	else if Rnd(2) = 1 then
@@ -686,7 +687,7 @@ end;
 // UpdateScore
 // DESCRIPTION: Procedure updates the score
 // 				Player temp score returns the player back to (half way) of
-//				original score before death to their previous score if they 
+//				original score before death to their previous score if they
 //				recovered from death.
 //-----------------------------------------------------------------------------
 
@@ -705,7 +706,7 @@ begin
 		// Actual score < temp score? (recovered)
 		if ctrl.playerScore < ctrl.playerTempScore then
 		begin
-		 	// Set player score to temp score 
+		 	// Set player score to temp score
 			ctrl.playerScore += Round((ctrl.playerTempScore - ctrl.playerScore) / 2);
 			ctrl.playerTempScore := ctrl.playerScore;
 		end
@@ -720,7 +721,7 @@ begin
 			ctrl.highScore := ctrl.playerScore;
 	end
 	else if ctrl.playerLives <= 0 then // Player is dead!
-	begin	
+	begin
 		if TimerTicks(health.dyingTimer) >= 2500 then // Every 2500ms?
 		begin
 			ResetTimer(health.dyingTimer);
@@ -745,7 +746,7 @@ begin
 			RefreshScreen();
 			// Play die-2 sound if not playing already
 			// but only if 1st one is still playing
-			if 	(not SoundEffectPlaying('die-2')) 
+			if 	(not SoundEffectPlaying('die-2'))
 				and (SoundEffectPlaying('die-1')) then
 			begin
 				StopSoundEffect('die-1');
@@ -777,7 +778,7 @@ begin
 			begin
 				ctrl.dartLimit := 3;
 				ctrl.gameSpeed := 3;
-				healthChnce := 0;
+				healthChance := 0;
 				cloudChance := 0;
 			end;
 			10..19: // round two
@@ -858,15 +859,15 @@ begin
 		// AND random number is < chance possibility
 		if	not (health.onScreen)
 			and (Rnd(99) < healthChance * 100) then
-			SpawnHealth(health, balloon); 
-		
+			SpawnHealth(health, balloon);
+
 		ResetTimer(ctrl.chanceTimer);
 	end;
 end;
 
 //============================================================================
 // CheckKeys
-// DESCRIPTION:	Procedure checks for any key presses for both 
+// DESCRIPTION:	Procedure checks for any key presses for both
 //				in-game/not in-game functionality
 //============================================================================
 
@@ -911,7 +912,7 @@ end;
 //============================================================================
 
 procedure UpdateGame(	var balloon : BalloonData;
-						var darts : array of DartData; 
+						var darts : array of DartData;
 						var cloud : CloudData;
 						var health : HealthData;
 						var ctrl : ControlData);
@@ -924,7 +925,7 @@ begin
 
 	// Check balloon position
 	CheckBalloonPosition(balloon.xPos, balloon.status);
-	
+
 	// Update score and difficulty
 	UpdateScore(ctrl, health, balloon);
 	UpdateDifficulty(ctrl, cloud, health, balloon);
@@ -933,7 +934,7 @@ begin
 	BalloonCollideDarts(balloon, darts, ctrl, health);
 	BalloonCollideCloud(balloon, cloud, ctrl);
 	BalloonCollideHealth(balloon, health, ctrl);
-	
+
 	if ctrl.resetGame then // A reset game has been called?
 		// Reinitialise the game.
 		Initialise(balloon, darts, cloud, health, ctrl);
@@ -963,7 +964,7 @@ end;
 // DESCRIPTION:	Draw balloon and its copies if needed (i.e. if off screen)
 //-----------------------------------------------------------------------------
 
-procedure DrawBalloon(	const xPos : Integer; 
+procedure DrawBalloon(	const xPos : Integer;
 						const status : BalloonPosition);
 begin
 	DrawBitmap('balloon', xPos, BALLOON_YPOS);
@@ -1034,7 +1035,7 @@ begin
 	else if playerScore = highScore then // Player has achieved a high score
 		scoreColor := ColorYellow
 	else
-		scoreColor := ColorWhite; // Normal score color	
+		scoreColor := ColorWhite; // Normal score color
 
 	FillRectangle(ColorBlack, 0, ScreenHeight()-35, ScreenWidth(), 35);
 	DrawText(	playerScore+' metres',
@@ -1056,7 +1057,7 @@ end;
 //============================================================================
 
 procedure DrawGame(	const balloon : BalloonData;
-					const darts : array of DartData; 
+					const darts : array of DartData;
 					const cloud : CloudData;
 					const health : HealthData;
 					const ctrl : ControlData);
@@ -1154,7 +1155,7 @@ begin
 			DrawMenu(ctrl);
 
 	until WindowCloseRequested();
-	
+
 	// If player has achieved high score?
 	if ctrl.playerScore = ctrl.highScore then
 		// Write a high score to file

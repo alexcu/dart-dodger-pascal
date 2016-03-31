@@ -708,6 +708,7 @@ implementation
     var
         _SoundEffects: TStringHash;
         _Music: TStringHash;
+        _firstLoad: Boolean = false;
     
     function TryOpenAudio(): Boolean;
     begin
@@ -741,6 +742,12 @@ implementation
         {$IFDEF TRACE}
             TraceEnter('sgAudio', 'AudioReady', '');
         {$ENDIF}
+        
+        if not _firstLoad then
+        begin
+            OpenAudio();
+            _firstLoad := true;
+        end;
         
         result := sgShared.AudioOpen;
         
@@ -1395,14 +1402,28 @@ implementation
     function SoundEffectNamed(name: String): SoundEffect;
     var
         tmp : TObject;
+        filename: String;
     begin
         {$IFDEF TRACE}
             TraceEnter('sgAudio', 'SoundEffectNamed', name);
         {$ENDIF}
         
         tmp := _SoundEffects.values[name];
-        if assigned(tmp) then result := SoundEffect(tResourceContainer(tmp).Resource)
-        else result := nil;
+        if assigned(tmp) then 
+            result := SoundEffect(tResourceContainer(tmp).Resource)
+        else
+        begin
+            filename := PathToResource(name, SoundResource);
+
+            if FileExists(name) or FileExists(filename) then
+            begin
+                result := LoadSoundEffectNamed(name, name);
+            end
+            else
+            begin
+                result := nil;
+            end;
+        end;
         
         {$IFDEF TRACE}
             TraceExit('sgAudio', 'SoundEffectNamed', HexStr(result));
@@ -1456,6 +1477,7 @@ implementation
     function MusicNamed(name: String): Music;
     var
         tmp : TObject;
+        filename: String;
     begin
         {$IFDEF TRACE}
             TraceEnter('sgAudio', 'MusicNamed', name);
@@ -1463,7 +1485,16 @@ implementation
         
         tmp := _Music.values[name];
         if assigned(tmp) then result := Music(tResourceContainer(tmp).Resource)
-        else result := nil;
+        else
+        begin 
+            filename := PathToResource(name, SoundResource);
+
+            if FileExists(name) or FileExists(filename) then
+            begin
+              result := LoadMusicNamed(name, name);
+            end
+            else result := nil;
+        end;
         
         {$IFDEF TRACE}
             TraceExit('sgAudio', 'MusicNamed', HexStr(result));
